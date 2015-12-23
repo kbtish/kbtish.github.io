@@ -1,393 +1,91 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <head>
-<title>Operations with Signed Numbers</title>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>Mathletics Department</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <style type='text/css'>
     body {
         color: white;
-        background-color: black;
+        background-color: blue;
     }
     
     .center {
         margin: auto;
-        width: 50%;
+        width: 70%;
         border: 3px solid;
         padding: 10px;
     }
+    
+    a:link  {color:white;}
+    a:visited   {color:pink;}
+    
+    table {
+        text-align: center;
+    }
+    
+    ul {
+        text-align: left;
+    }
+    
 </style>
 <script type="text/javascript">
     /* <![CDATA[ */
     
-    // global variables
-    var inputString; // holds the value input by the user
-    var firstNum;
-    var secondNum;
-    var answer; // holds the answer
-    
-    // get numbers for the new problem
-    function generateNumbers() {
-        firstNum = Math.floor(Math.random() * 19) - 9; // random number between -9 and 9
-        secondNum = Math.floor(Math.random() * 19) - 9; // random number between -9 and 9
-    }
-    
-    // determine what kind of question to display
-    function selectQuestionType() {
-        // local variables
-        var numSelected = 0; // number of selected operations; reset to zero each time the function is called
-        var question = new Array(); // array to hold question types
-        var i; // will hold a random number
-        
-        // add checked operations to question array
-        if (document.forms[0].addition.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'addition';
-        }
-        if (document.forms[0].subtraction.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'subtraction';
-        }
-        if (document.forms[0].multiplication.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'multiplication';
-        }
-        if (document.forms[0].division.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'division';
-        }
-        
-        // randomly select which type of operation to do
-        i = Math.floor(Math.random() * numSelected);
-        if (question[i] == 'addition') {
-            additionProblem();
-        }
-        if (question[i] == 'subtraction') {
-            subtractionProblem();
-        }
-        if (question[i] == 'multiplication') {
-            multiplicationProblem();
-        }
-        if (question[i] == 'division') {
-            divisionProblem();
-        }
-        if (numSelected == 0) {
-            window.alert("Please select at least one operation.");
-        }
-        else {
-            document.getElementById('repeatAnswer').innerHTML = "<br />";
-            document.getElementById('feedback').innerHTML = "<br />";
-            document.getElementById('answer').innerHTML = "<br />";
-            clearAnswer(); // reset the input box
-        }
-    }
-    
-    // create an addition problem
-    function additionProblem() {
-        var problem = firstNum + ' + ' + secondNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum + secondNum;
-    }
-    
-    // create a subtraction problem
-    function subtractionProblem() {
-        var problem = firstNum + ' - ' + secondNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum - secondNum;
-    }
-    
-    // create a multiplication problem
-    function multiplicationProblem() {
-        var problem = firstNum + ' &bull; ' + secondNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum * secondNum;
-    }
-    
-    // create a division problem
-    function divisionProblem() {
-        // make sure it's not zero divided by zero
-        while (firstNum == 0) { // if the first number is zero
-            generateNumbers(); // get new numbers
-        }
-        // use the thirdNum variable to make sure our division will work out to an integer
-        var thirdNum = firstNum * secondNum;
-        var problem = thirdNum + ' &divide; ' + firstNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = secondNum;
-    }
-    // check the answer and give feedback
-    function checkAnswer() {
-        // make sure user inputs an answer
-        if (document.forms[0].userAnswer.value == '') { // input is blank
-            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
-            document.getElementById('feedback').innerHTML = '<br />';
-            return false;
-        }
-        // display user's answer               
-        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
-        // give appropriate feedback
-        if (document.forms[0].userAnswer.value == answer) { // answer is correct
-            if (document.forms[0].playVideo.checked == true) {
-                playCorrectAnswer();
-            }
-            document.getElementById('feedback').innerHTML = 'Correct!';
-            document.forms[0].newProblem.focus();
-            
-        }
-        else { // answer is incorrect
-            if (document.forms[0].playVideo.checked == true) {
-                playWrongAnswer();
-            }
-            document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
-            document.forms[0].userAnswer.focus();
-        }
-        return false;
-    }
-    
-    // allow numberpad to type in answer
-    function updateString(value) {
-        inputString += value;
-        document.forms[0].userAnswer.value = inputString;
-    }
-    
-    // +/- button for negative answers
-    function switchSign(value) {
-        if (inputString == '') {
-            updateString('-');
-        }
-        else {
-            inputString *= -1;
-            document.forms[0].userAnswer.value = inputString;
-        }
-    }
-    
-    // clear button to reset the form
-    function clearAnswer() {
-        document.forms[0].userAnswer.value = "";
-        inputString = "";
-    }
-    
-    // show the correct answer
-    function showAnswer() {
-        document.getElementById('answer').innerHTML = 'Answer: ' + answer;
-    }
-    // set or resest the video frame to blank
-    function resetVideoFrame() {
-        document.getElementById('videoSpace').innerHTML =
-                '<video width="240" height="132"></video>';
-    }
-    // call necessary functions when page loads
-    function loadPage() {
-        generateNumbers();     
-        document.forms[0].userAnswer.focus(); // set focus to input box
-        selectQuestionType(); // choose from the list of selected operations
-        resetVideoFrame();
-    }
-    // close the page
-    // APPEARS TO NOT WORK IN FIREFOX!!!
-    function closePage() {
-        if (document.forms[0].playVideo.checked == true) {
-            // let user know that the request is being processed
-            document.getElementById('closingMessage').innerHTML = 'closing...';
-            
-            // load video for the page closing
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="noMore" width="240" height="132">' +
-                    '<source src="files/no more.mp4" type="video/mp4"></source>' +
-                '</video>';
-            noMore.play();
-            
-            noMore.onended = function() { // when the video ends
-                window.open("","_self").close(); // close the window
-            }
-        }
-        else {
-            window.open("","_self").close(); // close the window
-        }     
-    }
-    // video feedback for correct answers
-    function playCorrectAnswer() {
-        var numVideos = 2;
-        var i = Math.floor(Math.random()*numVideos + 1);
-        
-        if (i==1) {
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="reallyGoodAtMath" width="240" height="132">' +
-                    '<source src="files/really good at math.mp4" type="video/mp4"></source>' +
-                '</video>';
-            playVideo(reallyGoodAtMath);
-        }
-        else if (i==2) {
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="smrt" width="240" height="132">' +
-                    '<source src="files/smrt.mp4" type="video/mp4"></source>' +
-                '</video>';
-            playVideo(smrt);
-        }
-        else {
-            document.alert("There was an error playing the video feedback");
-        }
-    }
-    // video feedback for wrong answers
-    function playWrongAnswer() {
-        var numVideos = 2;
-        var i = Math.floor(Math.random()*numVideos + 1);
-        
-        if (i==1) {
-            document.getElementById('videoSpace').innerHTML =
-                    '<video id="what" width="240" height="132">' +
-                        '<source src="files/what.mp4" type="video/mp4"></source>' +
-                    '</video>';
-            playVideo(what);
-        }
-        else if (i==2) {
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="isThatAQuestion" width="240 height="132">' +
-                    '<source src="files/Is that a question.mp4" type="video/mp4"></source>' +
-                '</video>';
-            playVideo(isThatAQuestion);
-        }
-        else {
-            document.alert("There was an error playing the video feedback");
-        }
-    }
-    
-    // play whichever video is called
-    function playVideo(video) {
-        video.play();
-        video.onended = function() { // when the video ends
-            resetVideoFrame();    
-        }
-    }
     /* ]]> */
 </script>
 </head>
 
-<body id='page' onload='loadPage();'>
-<div class='center'>
-<form action=''>    
+<body id='page'>
+<div class='center' style='text-align:center;'>
+<h1>Mathletics Department</h1><br />
+What do you want to practice?<br />
     <table>
         <tr>
-            <td><h2>Operations with Signed Numbers</h2></td>
+            <td>&nbsp;</td><td></td><td></td>
         </tr>
         <tr>
-            <td>
-                <!-- prompt -->
-                Evaluate the following expression:
+            <th>Arithmetic</th>
+            <th>Percentages</th>
+            <th>Trigonometry</th>
+        </tr>
+        <tr>
+            <td><!-- links for arithmetic practice -->
+                <ul>
+                    <li>
+                        <a href='operations_with_signed_numbers.html'>
+                            Operations with Signed Numbers
+                        </a>
+                    </li>
+                </ul>
+            </td>
+            <td><!-- links for percentages practice -->
+                <ul>
+                    <li>
+                        <a href='percentages.html'>Percentages</a>
+                    </li>
+                </ul>
+            </td>
+            <td><!-- links for trigonometry practice -->
+                <ul>
+                    <li>
+                        <a href='Trig_definitions.html'>
+                            Definition of trig. functions
+                        </a>
+                    </li>
+                    <li>
+                        <a href='Trig_solve_side.html'>
+                            Solve for a side length
+                        </a>
+                    </li>
+                    <li>
+                        <a href='Trig_solve_angle.html'>
+                            Solve for an angle
+                        </a>
+                    </li>
+                </ul>
             </td>
         </tr>
     </table>
-    <table>
-        <tr>
-            <!-- left side of page follows... -->
-            <td>
-                <table>
-                    <tr>
-                        <td id='problemSpace'>
-                            <!-- random problem -->
-                            &nbsp;
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!-- input answer -->
-                            Answer: 
-                            <input type='text' name='userAnswer' size='3' />
-                            <br /><br />
-                            <!-- keypad -->
-                            <input type='button' name='seven' style='width: 50px' value='7' onclick='updateString("7");' />
-                            <input type='button' name='eight' style='width: 50px' value='8' onclick='updateString("8");' />
-                            <input type='button' name='nine' style='width: 50px' value='9' onclick='updateString("9");' />
-                            <br />
-                            <input type='button' name='four' style='width: 50px' value='4' onclick='updateString("4");' />
-                            <input type='button' name='five' style='width: 50px' value='5' onclick='updateString("5");' />
-                            <input type='button' name='six' style='width: 50px' value='6' onclick='updateString("6");' />
-                            <br />
-                            <input type='button' name='one' style='width: 50px' value='1' onclick='updateString("1");' />
-                            <input type='button' name='two' style='width: 50px' value='2' onclick='updateString("2");' />
-                            <input type='button' name='three' style='width: 50px' value='3' onclick='updateString("3");' />
-                            <br />
-                            <input type='button' name='zero' style='width: 50px' value='0' onclick='updateString("0");' />
-                            <input type='button' name='point' style='width: 50px' value='+/-' onclick='switchSign("-");' />
-                            <input type='button' name='clear' style='width: 50px;' value='Clear' onclick='clearAnswer();' />
-                            <br />
-                            <br />
-                            <input type='submit' value='Check my answer' style='width: 158px' onclick=' return checkAnswer();' />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td id='repeatAnswer'>
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td id='feedback'>
-                            <!-- feedback -->
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!-- button to generate a new problem -->
-                            <input type='button' name='newProblem' value='New problem' onclick='loadPage();' />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!-- show correct answer -->
-                            <input type='button' value='Show answer' onclick='showAnswer();' />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td id='answer'>
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type='button' value='Close window' onclick='closePage();' />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td id='closingMessage'>
-                            &nbsp;
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <!-- right side of page follows... -->
-            <td style='width:10%;'>
-                <table>
-                    <tr>
-                        <td style='border:solid;'>
-                            Choose which operations to practice<br />
-                            <input type='checkbox' name='addition' checked='checked' />Add<br />
-                            <input type='checkbox' name='subtraction' />Subtract<br />
-                            <input type='checkbox' name='multiplication' />Multiply<br />
-                            <input type='checkbox' name='division' />Divide<br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <br/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type='checkbox' name='playVideo' />
-                            Play video feedback
-                        </td>
-                    </tr>
-                    <tr>
-                        <td id='videoSpace' width='240' height='132'>
-                            &nbsp;
-                        </td>
-                    </tr>
-                </table> 
-            </td>
-        </tr>
-    </table>
-</form>
+    
 <br />
 <!-- valid page icon 
 <p>

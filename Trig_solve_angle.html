@@ -1,0 +1,520 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Basic Trigonometry - Solve for an angle</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<style type='text/css'>
+    body {
+        color: white;
+        background-color: blue;
+    }
+    
+    .center {
+        margin: auto;
+        width: 60%;
+        border: 3px solid;
+        padding: 10px;
+    }
+    
+    a:link  {color:white;}
+    a:visited   {color:pink;}
+</style>
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    // global variables
+    var inputString = ''; // holds the value input by the user
+    // parts of the triangle
+        var angle1;
+        var angle2;
+        var leg1;
+        var leg2;
+        var hypotenuse;
+    var sideNum1; // value of one of the side lengths
+    var sideNum2; // value of the angle
+    var answer; // holds the answer
+    var problem; // holds text for the problem
+    
+    // allow numberpad to type in answer
+    function updateString(value) {
+        inputString += value;
+        document.forms[0].userAnswer.value = inputString;
+    }
+    
+    // reset the form
+    function clearAnswer() {
+        document.forms[0].userAnswer.value = "";
+        inputString = "";
+    }
+    
+    // load a diagram
+    function loadDiagram() {
+        // randomly select which diagram to use
+        var i = Math.floor(Math.random()*8 + 1); // random number between 1 and 8 inclusive        
+        switch (i) { // which diagram is displayed? 
+            case 1:
+                document.images[0].src = 'pictures/trig triangles/diagram1.png';
+                angle1 = '&ang;A';
+                angle2 = '&ang;B';
+                leg1 = 'a';
+                leg2 = 'b';
+                hypotenuse = 'c';
+                break;
+            case 2:
+                document.images[0].src = 'pictures/trig triangles/diagram2.png';
+                angle1 = '&ang;E';
+                angle2 = '&ang;F';
+                leg1 = 'e';
+                leg2 = 'f';
+                hypotenuse = 'd';
+                break;
+            case 3:
+                document.images[0].src = 'pictures/trig triangles/diagram3.png';
+                angle1 = '&ang;Q';
+                angle2 = '&ang;R';
+                leg1 = 'q';
+                leg2 = 'r';
+                hypotenuse = 'p';
+                break;
+            case 4:
+                document.images[0].src = 'pictures/trig triangles/diagram4.png';
+                angle1 = '&ang;X';
+                angle2 = '&ang;Y';
+                leg1 = 'x';
+                leg2 = 'y';
+                hypotenuse = 'z';
+                break;
+            case 5:
+                document.images[0].src = 'pictures/trig triangles/diagram5.png';
+                angle1 = '&theta;';
+                angle2 = '&phi;';
+                leg1 = 'a';
+                leg2 = 'b';
+                hypotenuse = 'c';
+                break;
+            case 6:
+                document.images[0].src = 'pictures/trig triangles/diagram6.png';
+                angle1 = '&theta;';
+                angle2 = '&phi;';
+                leg1 = 'a';
+                leg2 = 'b';
+                hypotenuse = 'c';
+                break;
+            case 7:
+                document.images[0].src = 'pictures/trig triangles/diagram7.png';
+                angle1 = '&theta;';
+                angle2 = '&phi;';
+                leg1 = 'a';
+                leg2 = 'b';
+                hypotenuse = 'c';
+                break;
+            case 8:
+                document.images[0].src = 'pictures/trig triangles/diagram8.png';
+                angle1 = '&theta;';
+                angle2 = '&phi;';
+                leg1 = 'a';
+                leg2 = 'b';
+                hypotenuse = 'c';
+                break;
+            default: // should not happen
+                window.alert('Something went wrong.  Please reload the page.');
+        }
+    } // end of function loadDiagram()
+    
+    // select which kind of problem to ask
+    function selectType() {
+        // local variables
+        var numSelected = 0; // number of checkboxes selected for problem type
+        var question = new Array(); // array to hold problem types
+        var i; // will hold a random number
+        
+        // add checked operations to question array
+        if (document.forms[0].type1.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type1';
+        }
+        if (document.forms[0].type2.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type2';
+        }
+        
+        // make sure at least one type is selected
+        if (numSelected == 0) {
+            window.alert('Please select at least one problem type.');
+        }
+        
+        generateNumbers(); // get numbers for the problem
+        
+        // randomly select which problem type to display
+        i = Math.floor(Math.random() * numSelected);
+        if (question[i] == 'type1') {
+            createType1();
+        }
+        if (question[i] == 'type2') {
+            createType2();
+        }
+    } // end of function selectType()
+    
+    // get a new question to display and set the variable values
+    function generateNumbers() {
+        sideNum1 = Math.floor(Math.random()*100 + 1); // random number between 1 and 100
+        sideNum2 = Math.floor(Math.random()*sideNum1 + sideNum1 + 1); // a number at least one bigger than the first side
+    }
+    
+    // create a problem to find a leg length given an angle and the hypotenuse
+    function createType1() {
+        // 
+        
+        // determine which angle to solve for
+        var i = Math.floor(Math.random()*4);             
+        switch (i) {
+            case 0:
+                problem = 'If ' + leg1 + ' = ' + sideNum1 + ' and ' + hypotenuse + ' = ' + sideNum2 +
+                    ', how many degrees is ' + angle1 + '?';
+                answer = Math.asin(sideNum1/sideNum2); // answer in radians
+                answer = (180 / Math.PI * answer).toFixed(0); // converted to the nearest degree
+                break;
+            case 1:
+                problem = 'If ' + leg1 + ' = ' + sideNum1 + ' and ' + hypotenuse + ' = ' + sideNum2 +
+                    ', how many degrees is ' + angle2 + '?';
+                answer = Math.acos(sideNum1/sideNum2); // answer in radians
+                answer = (180 / Math.PI * answer).toFixed(0); // converted to the nearest degree
+                break;
+            case 2:
+                problem = 'If ' + leg2 + ' = ' + sideNum1 + ' and ' + hypotenuse + ' = ' + sideNum2 +
+                    ', how many degrees is ' + angle1 + '?';
+                answer = Math.acos(sideNum1/sideNum2); // answer in radians
+                answer = (180 / Math.PI * answer).toFixed(0); // converted to the nearest degree
+                break;
+            case 3:
+                problem = 'If ' + leg2 + ' = ' + sideNum1 + ' and ' + hypotenuse + ' = ' + sideNum2 +
+                    ', how many degrees is ' + angle2 + '?';
+                answer = Math.asin(sideNum1/sideNum2); // answer in radians
+                answer = (180 / Math.PI * answer).toFixed(0); // converted to the nearest whole degree
+                break;
+        }
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType1()
+    
+    // create a problem to find an angle using both legs
+    function createType2() {
+        // determine which angle to give
+        var i = Math.floor(Math.random()*2);        
+        switch (i) {
+            case 0:
+                problem = 'If ' + leg1 + ' = ' + sideNum1 + ' and ' + leg2 + ' = ' + sideNum2 +
+                    ', how many degrees is ' + angle1 + '?';
+                answer = (180 / Math.PI * Math.atan(sideNum1/sideNum2)).toFixed(0);
+                break;
+            case 1:
+                problem = 'If ' + leg1 + ' = ' + sideNum1 + ' and ' + leg2 + ' = ' + sideNum2 +
+                    ', how many degrees is ' + angle2 + '?';
+                answer = (180 / Math.PI * Math.atan(sideNum2/sideNum1)).toFixed(0);
+                break;
+        }
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    }
+    
+    // check the answer and give feedback
+    function checkAnswer() {
+        // make sure the user has input an answer
+        if (document.forms[0].userAnswer.value == '') { // input is blank
+            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
+            document.getElementById('feedback').innerHTML = '<br />';
+            document.forms[0].userAnswer.focus(); // set focus to input box
+            return false;
+        }
+        
+        // display user's answer
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' +
+                                                            document.forms[0].userAnswer.value +
+                                                            '<sup>o</sup>';
+        
+        // check the answer and give appropriate feedback
+        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+            if (document.forms[0].playVideo.checked == true) {
+                playCorrectAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            document.forms[0].newProblem.focus();
+        }
+        else if (document.forms[0].userAnswer.value == Math.floor(answer) && 10*answer%10 == 0) {
+            // user forgot to enter the decimal point zero
+            if (document.forms[0].playVideo.checked == true) {
+                document.getElementById('videoSpace').innerHTML =
+                '<video id="partialCredit" width="240" height="132">' +
+                    '<source src="files/partial credit.mp4" type="video/mp4"></source>' +
+                '</video>';
+            playVideo(partialCredit);
+            }
+            document.getElementById('feedback').innerHTML = 'Include decimals of zero.<br />' +
+                    'Example: 5.0 instead of 5';
+            document.forms[0].point.focus();
+        }
+        else { // answer is incorrect
+            if (document.forms[0].playVideo.checked == true) {
+                playWrongAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
+            document.forms[0].userAnswer.focus();
+        }
+        return false;
+    } // end of function checkAnswer()
+    
+    // show the answer if the user is stuck
+    function showAnswer() {
+        document.getElementById('answer').innerHTML = 'Answer: ' + answer + '<sup>o</sup>';
+    }
+    
+    // clear all text and input
+    function clearPage() {
+        clearAnswer();
+        document.getElementById('repeatAnswer').innerHTML = '&nbsp;';
+        document.getElementById('feedback').innerHTML = '&nbsp;';
+        document.getElementById('answer').innerHTML = '&nbsp;';        
+    }
+    // call the necessary functions when the page is loaded or reloaded
+    function loadPage() {
+        loadDiagram(); // choose a diagram for the problem
+        document.forms[0].userAnswer.focus(); // set focus to input box
+        selectType();
+        clearPage();
+        resetVideoFrame();
+    }
+    
+    // close the page
+    // APPEARS TO NOT WORK IN FIREFOX!!!
+    function closePage() {
+        if (document.forms[0].playVideo.checked == true) {
+            // let user know that the request is being processed
+            document.getElementById('closingMessage').innerHTML = 'closing...';
+            
+            // load video for the page closing
+            document.getElementById('videoSpace').innerHTML =
+                '<video id="noMore" width="240" height="132">' +
+                    '<source src="files/no more.mp4" type="video/mp4"></source>' +
+                '</video>';
+            noMore.play();
+            
+            noMore.onended = function() { // when the video ends
+                window.open("","_self").close(); // close the window
+                window.alert('Operation failed'); // if the window doesn't close
+                document.getElementById('closingMessage').innerHTML = ''; // reset text
+            }
+        }
+        else {
+            window.open("","_self").close(); // close the window
+            window.alert('Operation failed'); // if the window doesn't close
+        }
+        
+    }
+    // video feedback for correct answers
+    function playCorrectAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="reallyGoodAtMath" width="240" height="132">' +
+                        '<source src="files/really good at math.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(reallyGoodAtMath);
+                break;
+            case 2:    
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="smrt" width="240" height="132">' +
+                        '<source src="files/smrt.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(smrt);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    // video feedback for wrong answers
+    function playWrongAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                        '<video id="what" width="240" height="132">' +
+                            '<source src="files/what.mp4" type="video/mp4"></source>' +
+                        '</video>';
+                playVideo(what);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="notEvenClose" width="240" height="132">' +
+                        '<source src="files/not even close.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(notEvenClose);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // play whichever video is called
+    function playVideo(video) {
+        video.play();
+        video.onended = function() { // when the video ends
+            resetVideoFrame();    
+        }
+    }
+    
+    // set or reset the video frame to blank
+    function resetVideoFrame() {
+        document.getElementById('videoSpace').innerHTML =
+                '<video width="240" height="132"></video>';
+    }
+    /* ]]> */
+</script>
+</head>
+
+<body id='page' onload='loadPage();'>
+<div class='center'>
+<form action=''>
+    <table>
+        <tr>
+            <td>
+                <h2>Basic Trigonometry - Solve for an angle</h2>
+                <br />
+                <a href='index.html'>Home</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <!-- prompt -->
+                <br />
+                Use the diagram to answer the question.
+                <br />Figures are not to scale.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src='' alt='diagram' style='width:260px;height:238px;'/>  
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <!-- left side of page follows... -->
+            <td>
+                <table>
+                    <tr>
+                        <td id='problemSpace'>
+                            <!-- random problem -->
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- input answer -->
+                            <br />Round final answer to the nearest whole number.<br />
+                            Answer: 
+                            <input type='text' name='userAnswer' size='3' />
+                            <br /><br />
+                            <!-- keypad -->
+                            <input type='button' name='seven' style='width: 50px' value='7' onclick='updateString("7");' />
+                            <input type='button' name='eight' style='width: 50px' value='8' onclick='updateString("8");' />
+                            <input type='button' name='nine' style='width: 50px' value='9' onclick='updateString("9");' />
+                            <br />
+                            <input type='button' name='four' style='width: 50px' value='4' onclick='updateString("4");' />
+                            <input type='button' name='five' style='width: 50px' value='5' onclick='updateString("5");' />
+                            <input type='button' name='six' style='width: 50px' value='6' onclick='updateString("6");' />
+                            <br />
+                            <input type='button' name='one' style='width: 50px' value='1' onclick='updateString("1");' />
+                            <input type='button' name='two' style='width: 50px' value='2' onclick='updateString("2");' />
+                            <input type='button' name='three' style='width: 50px' value='3' onclick='updateString("3");' />
+                            <br />
+                            <input type='button' name='zero' style='width: 77px' value='0' onclick='updateString("0");' />
+                            <input type='button' name='clear' style='width: 77px;' value='Clear' onclick='clearAnswer();' />
+                            <br />
+                            <br />
+                            <input type='submit' value='Check my answer' style='width: 158px' onclick=' return checkAnswer();' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id='repeatAnswer'>
+                            <br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id='feedback'>
+                            <!-- feedback -->
+                            <br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- button to generate a new problem -->
+                            <input type='button' name='newProblem' value='New problem' onclick='loadPage();' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- show correct answer -->
+                            <input type='button' value='Show answer' onclick='showAnswer();' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id='answer'>
+                            <br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type='button' value='Close window' onclick='closePage();' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id='closingMessage'>
+                            &nbsp;
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <!-- right side of page follows... -->
+            <td style='width:38%;'>
+                <table>
+                    <tr>
+                        <td style='border:solid;'>
+                            Choose your problem type(s).<br />
+                            Solve for the angle using...<br />
+                            <input type='checkbox' name='type1' checked='checked' />a leg and the hypotenuse<br />
+                            <input type='checkbox' name='type2' />both legs<br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type='checkbox' name='playVideo' />
+                            Play video feedback
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id='videoSpace' width='240' height='132'>
+                            &nbsp;
+                        </td>
+                    </tr>
+                </table> 
+            </td>
+        </tr>
+    </table>
+    <a href='index.html'>Home</a>
+</form>
+</div>
+</body>
+</html>
