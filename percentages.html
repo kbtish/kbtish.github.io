@@ -151,22 +151,26 @@
         }
         else if ((version == 2) && (document.forms[0].userAnswer.value == missingPercent)) {
             // user forgot the percent symbol 
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="partialCredit" width="240" height="132">' +
-                    '<source src="files/partial credit.mp4" type="video/mp4"></source>' +
-                '</video>';
-            playVideo(partialCredit);
+            if (document.forms[0].playVideo.checked == true) {
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="partialCredit" width="240" height="132">' +
+                        '<source src="files/partial credit.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(partialCredit);
+            }
             
             document.getElementById('feedback').innerHTML = 'Don\'t forget the %.';
             document.forms[0].percent.focus();
         }
         else if ((version == 1 || version == 3) && (document.forms[0].userAnswer.value == answer + '%')) {
             // user added the % when it wasn't needed
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="partialCredit" width="240" height="132">' +
-                    '<source src="files/partial credit.mp4" type="video/mp4"></source>' +
-                '</video>';
-            playVideo(partialCredit);
+            if (document.forms[0].playVideo.checked == true) {
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="partialCredit" width="240" height="132">' +
+                        '<source src="files/partial credit.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(partialCredit);
+            }
             
             document.getElementById('feedback').innerHTML = 'Oops.  You don\'t need the %.';
             document.forms[0].clear.focus();
