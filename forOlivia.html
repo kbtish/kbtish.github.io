@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+.center {
+    margin: auto;
+    width: 60%;
+    border: 3px solid;
+    padding: 10px;
+}
+
+#div1, #div2, #div3, #divAnswer 
+{float:left; width:100px; height:55px; margin:10px;padding:10px;border:1px solid #aaaaaa;}
+</style>
+<script>
+// global variables
+var answer; // holds the answer
+
+// load a picture
+function loadPicture() {
+    // randomly select the picture to display
+    var i = Math.floor(Math.random()*3);
+    switch (i) {
+        case 0:
+            document.images[0].src = 'drag_and_drop_images/dog.jpg';
+            answer = 'dog';
+            break;
+        case 1:
+            document.images[0].src = 'drag_and_drop_images/cat.jpg';
+            answer = 'cat';
+            break;
+        case 2:
+            document.images[0].src = 'drag_and_drop_images/pig.jpg';
+            answer = 'pig';
+            break;
+        default: // should not happen
+            window.alert('Something went wrong');
+    }
+}
+
+// load words in a random order
+function loadWords() {
+    // 6 ways to arrange 3 images in a row
+    var i = Math.floor(Math.random()*6);
+    var dog = 'drag_and_drop_words/dog.jpg';
+    var cat = 'drag_and_drop_words/cat.jpg';
+    var pig = 'drag_and_drop_words/pig.jpg';
+    
+    switch (i) {
+        case 0: // dog, cat, pig
+            document.images[1].src = dog;
+            document.images[2].src = cat;
+            document.images[3].src = pig;
+            
+            if (answer == 'dog') {
+                answer = 'left';
+            }
+            else if (answer == 'cat') {
+                answer = 'middle';
+            }
+            else if (answer == 'pig') {
+                answer = 'right';
+            }            
+            break;
+        case 1: // dog, pig, cat
+            document.images[1].src = dog;
+            document.images[2].src = pig;
+            document.images[3].src = cat;
+            
+            if (answer == 'dog') {
+                answer = 'left';
+            }
+            else if (answer == 'pig') {
+                answer = 'middle';
+            }
+            else if (answer == 'cat') {
+                answer = 'right';
+            }
+            break;
+        case 2: // cat, dog, pig
+            document.images[1].src = cat;
+            document.images[2].src = dog;
+            document.images[3].src = pig;
+            
+            if (answer == 'cat') {
+                answer = 'left';
+            }
+            else if (answer == 'dog') {
+                answer = 'middle';
+            }
+            else if (answer == 'pig') {
+                answer = 'right';
+            }
+            break;
+        case 3: // cat, pig, dog
+            document.images[1].src = cat;
+            document.images[2].src = pig;
+            document.images[3].src = dog;
+            
+            if (answer == 'cat') {
+                answer = 'left';
+            }
+            else if (answer == 'pig') {
+                answer = 'middle';
+            }
+            else if (answer == 'dog') {
+                answer = 'right';
+            }
+            break;
+        case 4: // pig, dog, cat
+            document.images[1].src = pig;
+            document.images[2].src = dog;
+            document.images[3].src = cat;
+            
+            if (answer == 'pig') {
+                answer = 'left';
+            }
+            else if (answer == 'dog') {
+                answer = 'middle';
+            }
+            else if (answer == 'cat') {
+                answer = 'right';
+            }
+            break;
+        case 5: // pig, cat, dog
+            document.images[1].src = pig;
+            document.images[2].src = cat;
+            document.images[3].src = dog;
+            
+            if (answer == 'pig') {
+                answer = 'left';
+            }
+            else if (answer == 'cat') {
+                answer = 'middle';
+            }
+            else if (answer == 'dog') {
+                answer = 'right';
+            }
+            break;
+        default:
+            window.alert('Something went wrong');
+    }
+}
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+// allows drop of word/picture and checks to see if its the correct word/picture
+function drop(ev) {
+    var data = ev.dataTransfer.getData("text");
+    
+    if (data == answer) { // correct answer
+        // allow drop to occur
+        ev.preventDefault();
+        
+        // the following line of code was taken out so that the correct answer does not stay in the box
+        //ev.target.appendChild(document.getElementById(data));        
+        
+        // play video
+        document.getElementById('videoSpace').innerHTML =
+            '<video id="woohoo" width="240" height="132">' +
+                '<source src="woohoo.mp4" type="video/mp4"></source>' +
+            '</video>';
+        playVideo(woohoo);
+    }
+    else {
+        window.alert('incorrect');
+        return false;
+    }
+}
+
+// play whichever video is called
+function playVideo(video) {
+    video.play();
+    video.onended = function() { // when the video ends
+        resetVideoFrame();
+        loadPage();    
+    }
+}
+
+// set or reset the video frame to blank
+function resetVideoFrame() {
+    document.getElementById('videoSpace').innerHTML =
+            '<video width="240" height="132"></video>';
+}
+
+// call the necessary functions when the page loads
+function loadPage() {
+    loadPicture();
+    loadWords();
+}
+</script>
+</head>
+<body class='center' onload='loadPage();'>
+
+<table>
+    <tr>
+        <td style='text-align:center;'>
+            <img src='' alt='picture' style='width:200px; height:186px;' />
+        </td>
+        <td>
+            <p
+            id='divAnswer'
+            ondrop="return drop(event)"
+            ondragover="allowDrop(event)"
+            style='float:none; text-align:center; width=97; height=65;'
+            >
+            </p>        
+        </td>
+        <td id='videoSpace' style='width:240; height:132px;'>
+            &nbsp;
+        </td>
+    </tr>
+</table>
+
+    
+</div>
+<div id="div1">
+  <img src="" draggable="true" ondragstart="drag(event)" id="left" width="97" height="65">
+</div>
+
+<div id="div2">
+  <img src="" draggable="true" ondragstart="drag(event)" id="middle" width="97" height="65">
+</div>
+
+<div id="div3">
+  <img src="" draggable="true" ondragstart="drag(event)" id="right" width="97" height="65">
+</div>
+
+</body>
+</html>
