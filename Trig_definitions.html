@@ -170,19 +170,19 @@
         if (question[i] == 'type1') {
             createType1();
         }
-        if (question[i] == 'type2') {
+        else if (question[i] == 'type2') {
             createType2();
         }
-        if (question[i] == 'type3') {
+        else if (question[i] == 'type3') {
             createType3();
         }
-        if (question[i] == 'type4') {
+        else if (question[i] == 'type4') {
             createType4();
         }
-        if (question[i] == 'type5') {
+        else if (question[i] == 'type5') {
             createType5();
         }
-        if (question[i] == 'type6') {
+        else if (question[i] == 'type6') {
             createType6();
         }
     } // end of function selectType()
@@ -443,6 +443,38 @@
         document.getElementById('videoSpace').innerHTML =
                 '<video width="240" height="132"></video>';
     }
+    
+    // open a new window with a help video
+    function openHelpVideo(i) { // i indicates which topic was selected for help video
+        switch (i) {
+            case 1: // sine function
+                var help = window.open('a', 'b', 'fullscreen=no');
+                help.document.write(
+                    '<video autoplay controls>' +
+                        '<source src="help videos/helpDefnSin.mp4" type="video/mp4"></source>' +
+                    '</video>'
+                    );
+                break;
+            case 2: // cosine
+                var help = window.open('a', 'b', 'fullscreen=no');
+                help.document.write(
+                    '<video autoplay controls>' +
+                        '<source src="help videos/helpDefnCos.mp4" type="video/mp4"></source>' +
+                    '</video>'
+                    );
+                break;
+            case 3: // tan
+                var help = window.open('a', 'b', 'fullscreen=no');
+                    help.document.write(
+                        '<video autoplay controls>' +
+                            '<source src="help videos/helpDefnSin.mp4" type="video/mp4"></source>' +
+                        '</video>'
+                        );
+                    break;
+            default: // should not happen
+                alert('something went wrong');
+        }
+    }
     /* ]]> */
 </script>
 </head>
@@ -561,7 +593,18 @@
                         </td>
                     </tr>
                     <tr>
+                        <td style='border: dashed;'>
+                            Need help?  Watch a video <br />
+                            <ul>
+                                <li><a href='' onclick='openHelpVideo(1);'>Finding sine of an angle</a></li>
+                                <li><a href='' onclick='openHelpVideo(2);'>Finding cosine of an angle</a></li>
+                                <li><a href='' onclick='openHelpVideo(3);'>Finding tangent of an angle</a></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>
+                            <br />
                             <input type='checkbox' name='playVideo' />
                             Play video feedback
                         </td>
