@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Flashcards - Math Facts</title>
+<title>Flashcards - Addition Practice</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -16,100 +16,101 @@ span {
     
     // global variables
     var inputString; // holds the value input by the user
-    var firstNum;
-    var secondNum;
+    var firstNum; // first addend
+    var secondNum; // second addend
+    var thirdNum; // third addend; this will be zero if only two addends are displayed
+    var minValue; // minimum value of an addend
+    var maxValue; // maximum value of an addend
     var answer; // holds the answer
+    var numAddends; // how many addends to display for the problem (either 2 or 3)
     
     // get numbers for the new problem
-    function generateNumbers() {
-        firstNum = Math.floor(Math.random() * 10); // random number between 0 and 9
-        secondNum = Math.floor(Math.random() * 10); // random number between 0 and 9
-    }
-    
-    // determine what kind of question to display
-    function selectQuestionType() {
-        // local variables
-        var numSelected = 0; // number of selected operations; reset to zero each time the function is called
-        var question = new Array(); // array to hold question types
-        var i; // will hold a random number
-        
-        // add checked operations to question array
-        if (document.forms[0].addition.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'addition';
-        }
-        if (document.forms[0].subtraction.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'subtraction';
-        }
-        if (document.forms[0].multiplication.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'multiplication';
-        }
-        if (document.forms[0].division.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'division';
-        }
-        
-        // randomly select which type of operation to do
-        i = Math.floor(Math.random() * numSelected);
-        if (question[i] == 'addition') {
-            additionProblem();
-        }
-        else if (question[i] == 'subtraction') {
-            subtractionProblem();
-        }
-        else if (question[i] == 'multiplication') {
-            multiplicationProblem();
-        }
-        else if (question[i] == 'division') {
-            divisionProblem();
-        }
-        else if (numSelected == 0) {
-            window.alert("Please select at least one operation.");
+    function generateNumbers() {        
+        if (document.forms[0].factsOnly.checked == true) { // add single digit with single digit
+            firstNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+            secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+            thirdNum = 0;
         }
         else {
-            document.getElementById('repeatAnswer').innerHTML = "<br />";
-            document.getElementById('feedback').innerHTML = "<br />";
-            document.getElementById('answer').innerHTML = "<br />";
-            clearAnswer(); // reset the input box
-        }
+            numAddends = parseInt(document.forms[0].numAddends.value);
+        
+            // generate the first number
+            var i = parseInt(document.forms[0].firstDigits.value);
+            
+            if (i == 1) {
+                minValue = 0;
+            }
+            else {
+                minValue = Math.pow(10, i-1);
+            }
+            
+            maxValue = Math.pow(10, i) - 1;
+            
+            firstNum = Math.floor(Math.random()*(maxValue - minValue + 1) + minValue); // random number
+            
+            // generate the second number
+            var j = parseInt(document.forms[0].secondDigits.value);
+            
+            if (j == 1) {
+                minValue = 0;
+            }
+            else {
+                minValue = Math.pow(10, j-1);
+            }
+            
+            maxValue = Math.pow(10, j) - 1;
+            
+            secondNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number 
+            
+            // generate the third number, if necessary; if only two numbers are displayed, set thirdNum to zero
+            var k = parseInt(document.forms[0].thirdDigits.value);
+            
+            if (numAddends == 2) {
+                thirdNum = 0;
+            }
+            else {            
+                if (k == 1) {
+                minValue = 0;
+                }
+                else {
+                    minValue = Math.pow(10, k-1);
+                }
+                maxValue = Math.pow(10, k) - 1;
+            
+                thirdNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number
+            }   
+        }     
+    }
+
+    // display large numbers with commas
+    function numberWithCommas(x) {
+       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
     
     // create an addition problem
-    function additionProblem() {
-        var problem = firstNum + ' + ' + secondNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum + secondNum;
-    }
-    
-    // create a subtraction problem
-    function subtractionProblem() {
-        var thirdNum = firstNum + secondNum;
-        var problem = thirdNum + ' - ' + secondNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum;
-    }
-    
-    // create a multiplication problem
-    function multiplicationProblem() {
-        var problem = firstNum + ' &times; ' + secondNum + ' = ?';
-        document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum * secondNum;
-    }
-    
-    // create a division problem
-    function divisionProblem() {
-        // make sure it's not zero divided by zero
-        while (firstNum == 0) { // if the first number is zero
-            generateNumbers(); // get new numbers
+    function generateProblem() {
+        var problem;
+        
+        // display large numbers with commas
+        var firstDisplay = numberWithCommas(firstNum);
+        var secondDisplay = numberWithCommas(secondNum);
+        var thirdDisplay = numberWithCommas(thirdNum);
+        
+        if (numAddends == 2 || document.forms[0].factsOnly.checked == true) {
+            problem = firstDisplay + ' + ' + secondDisplay + ' = ?';
         }
-        // use the thirdNum variable to make sure our division will work out to an integer
-        var thirdNum = firstNum * secondNum;
-        var problem = thirdNum + ' &divide; ' + firstNum + ' = ?';
+        else if (numAddends == 3) {
+            problem = firstDisplay + ' + ' + secondDisplay + ' + ' + thirdDisplay + ' = ?';
+        }
+        else {
+            window.alert('Oops!  Something went wrong.  Please refresh the page.');
+        }
+        
         document.getElementById('problemSpace').innerHTML = problem;
-        answer = secondNum;
+        
+        answer = firstNum + secondNum + thirdNum;
     }
+ 
     // check the answer and give feedback
     function checkAnswer() {
         // make sure user inputs an answer
@@ -119,15 +120,16 @@ span {
             return false;
         }
         // display user's answer               
-        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
         // give appropriate feedback
-        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+        if (inputString == answer) { // answer is correct
             if (document.forms[0].playVideo.checked == true) {
                 playCorrectAnswer();
             }
             document.getElementById('feedback').innerHTML = 'Correct!';
             document.forms[0].newProblem.focus();
             
+            return false;
         }
         else { // answer is incorrect
             if (document.forms[0].playVideo.checked == true) {
@@ -142,9 +144,10 @@ span {
     // allow numberpad to type in answer
     function updateString(value) {
         inputString += value;
-        document.forms[0].userAnswer.value = inputString;
+        var displayString = numberWithCommas(inputString)
+        document.forms[0].userAnswer.value = displayString;
     }
- 
+    
     // clear button to reset the form
     function clearAnswer() {
         document.forms[0].userAnswer.value = "";
@@ -153,21 +156,48 @@ span {
     
     // show the correct answer
     function showAnswer() {
-        document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+        document.getElementById('answer').innerHTML = 'Answer: ' + numberWithCommas(answer);
     }
     // set or reset the video frame to blank
     function resetVideoFrame() {
         document.getElementById('videoSpace').innerHTML =
                 '<video width="240" height="132"></video>';
     }
+    
+    // hide or show the selection list for the third number
+    function changeVisibility() {
+        if (document.forms[0].factsOnly.checked == true) { // 'Facts only' is selected
+            // make the other options invisibile
+            document.getElementById('numAddends').style.visibility = 'hidden';
+            document.getElementById('firstDigits').style.visibility = 'hidden';
+            document.getElementById('secondDigits').style.visibility = 'hidden';
+            document.getElementById('thirdDigits').style.visibility = 'hidden';
+        }
+        else { // 'Facts only' is not selected
+            // make number of addends and digits for first two numbers visible
+            document.getElementById('numAddends').style.visibility = 'visible';
+            document.getElementById('firstDigits').style.visibility = 'visible';
+            document.getElementById('secondDigits').style.visibility = 'visible';
+        
+            // determine if the third number option should be visible or hidden
+            var i = parseInt(document.forms[0].numAddends.value);
+            if (i == 2) {
+                document.getElementById('thirdDigits').style.visibility = 'hidden';
+            }
+            else {
+                document.getElementById('thirdDigits').style.visibility = 'visible';
+            }      
+        }
+    }
     // call necessary functions when page loads
     function loadPage() {
         clearAnswer();
         generateNumbers();
+        generateProblem();
+        changeVisibility();
         document.getElementById('repeatAnswer').innerHTML = '';
         document.getElementById('feedback').innerHTML = '';
         document.getElementById('answer').innerHTML = '';
-        selectQuestionType(); // choose from the list of selected operations
         resetVideoFrame();
     }
     // video feedback for correct answers
@@ -194,6 +224,7 @@ span {
                 document.alert("There was an error playing the video feedback");
         }
     }
+    
     // video feedback for wrong answers
     function playWrongAnswer() {
         var numVideos = 2;
@@ -245,18 +276,18 @@ span {
 </div>
 
 <div id="section">
-<h2>Math Facts Flash Cards</h2>
+<h2>Addition Flash Cards</h2>
 <form action=''>
     <table>
     <tr>
-    <td style='border:solid; width:40%;'>
+    <td style='border:solid; width:45%; padding:5px;'>
         Perform the operation:
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
         <br /><br />
         
         <!-- input box for user's answer -->
-        Answer:<input type='text' name='userAnswer' size='4' />
+        Answer:<input type='text' name='userAnswer' size='6' />
         <br /><br />
         
         <!-- keypad -->
@@ -302,14 +333,62 @@ span {
         <span id='closingMessage'>&nbsp;</span>
     </td>
     
-    <td style='margin-left:15px; border:none;'>
+    <td style='margin-left:15px; border:none; text-align:right;'>
         <!-- options -->
         <span>
-            Choose which operations to practice<br />
-            <input type='checkbox' name='addition' checked='checked' />Add<br />
-            <input type='checkbox' name='subtraction' />Subtract<br />
-            <input type='checkbox' name='multiplication' />Multiply<br />
-            <input type='checkbox' name='division' />Divide<br />
+            Facts only
+            <input type='checkbox' name='factsOnly' onchange='changeVisibility();' />
+        </span>
+        <br /><br />
+        
+        <span id='numAddends'>
+            Number of addends
+            <select name='numAddends' onchange='changeVisibility();'>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+            </select>
+        </span>
+        <br /><br />
+        
+        <span id='firstDigits'>
+            Digits for the first number
+            <select name='firstDigits'>
+                <option value='1'>1</option>
+                <option value='2' selected='selected'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+            </select>
+        </span>
+        <br />
+        
+        <span id='secondDigits'>
+            Digits for the second number
+            <select name='secondDigits'>
+                <option value='1'>1</option>
+                <option value='2' selected='selected'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+            </select>
+        </span>
+        <br />
+        
+        <span id='thirdDigits'>
+            Digits for the third number
+            <select name='thirdDigits'>
+                <option value='1'>1</option>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+            </select>
         </span>
         <br />
         <!-- button to generate a new problem -->
