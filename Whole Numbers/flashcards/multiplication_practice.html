@@ -104,7 +104,6 @@ span {
                 playWrongAnswer();
             }
             document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
-            document.forms[0].userAnswer.focus();
         }
         return false;
     }
@@ -294,7 +293,7 @@ span {
     <td style='margin-left:15px; border:none; text-align:right;'>
         <!-- options -->        
         <span>
-            Facts only
+            Facts only (0-9)
             <input type='checkbox' name='factsOnly' onchange='changeVisibility();' />
         </span>
         <br /><br />
