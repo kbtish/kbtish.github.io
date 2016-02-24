@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Flashcards - Math Facts</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
+<style type='text/css'>
+span {
+    background-color: inherit;
+    font-weight: bold;
+}
+</style>
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    // global variables
+    var inputString = ''; // holds the value input by the user
+    var number; // holds the number displayed
+    var answer; // holds the answer
+    var displayAnswer; //holds the answer displayed with commas, if needed
+    var problem; // holds text for the problem
+    
+    // display large numbers with commas
+    function numberWithCommas(x) {
+       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    
+    // allow numberpad to type in answer
+    function updateString(value) {
+        inputString += value;
+        var displayString = numberWithCommas(inputString)
+        document.forms[0].userAnswer.value = displayString;
+    }
+    
+    // reset the form
+    function clearAnswer() {
+        document.forms[0].userAnswer.value = "";
+        inputString = "";
+    }
+    
+    // select which kind of problem to ask
+    function selectType() {
+        // local variables
+        var numSelected = 0; // number of checkboxes selected for problem type
+        var question = new Array(); // array to hold problem types
+        var i; // will hold a random number
+        
+        // add checked operations to question array
+        if (document.forms[0].type1.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type1';
+        }
+        if (document.forms[0].type2.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type2';
+        }
+        if (document.forms[0].type3.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type3';
+        }
+        /* numbers with decimals need to display without a comma after the decimal point
+        if (document.forms[0].type4.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type4';
+        }
+        if (document.forms[0].type5.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type5';
+        }
+        if (document.forms[0].type6.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type6';
+        }
+        if (document.forms[0].type7.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'type7';
+        }
+        */
+        
+        // make sure at least one type is selected
+        if (numSelected == 0) {
+            window.alert('Please select at least one problem type.');
+        }
+        
+        // randomly select which problem type to display
+        i = Math.floor(Math.random() * numSelected);
+        if (question[i] == 'type1') {
+            createType1();
+        }
+        else if (question[i] == 'type2') {
+            createType2();
+        }
+        else if (question[i] == 'type3') {
+            createType3();
+        }
+        else if (question[i] == 'type4') {
+            createType4();
+        }
+        else if (question[i] == 'type5') {
+            createType5();
+        }
+        else if (question[i] == 'type6') {
+            createType6();
+        }
+        else if (question[i] == 'type7') {
+            createType7();
+        }
+    } // end of function selectType()
+    
+    // round to the nearest thousand; whole numbers only
+    function createType1() {
+        number = (Math.random()*(99999-1+1) + 1).toFixed(0);
+        
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + '<br />to the nearest thousand.';
+        
+        answer = (number / 1000).toFixed(0) * 1000;
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType1()
+    
+    // round to the nearest hundred, whole numbers only
+    function createType2() {
+        number = (Math.random()*(99999-1+1) + 1).toFixed(0);
+
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + '<br />to the nearest hundred.';
+        
+        answer = (number / 100).toFixed(0) * 100;
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType2()  
+    
+    // round to the nearest ten; whole numbers only
+    function createType3() {
+        number = (Math.random()*(9999-1+1) + 1).toFixed(0);
+        
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + '<br />to the nearest ten.';
+        
+        answer = (number / 10).toFixed(0) * 10;
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType3()
+    
+    /* numbers with decimals need to be displayed without commas after the decimal
+    // round to the nearest whole number
+    function createType4() {
+        // always display a decimal number
+        var k = Math.floor(Math.random()*4 + 1); // one to four decimal places
+        number = Math.random()*(9999-1+1) + 1;
+        number = number.toFixed(k);
+        
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + '<br />to the nearest whole number.';
+        
+        answer = (number*1).toFixed(0);
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType4()
+    
+    // round to the nearest tenth
+    function createType5() {
+        // always display a decimal number
+        var k = Math.floor(Math.random()*3 + 2); // two to four decimal places
+        number = (Math.random()*(9999-1+1) + 1).toFixed(k);
+        
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + '<br />to the nearest tenth.';
+        
+        answer = (number*1).toFixed(1);
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType5()
+    
+    // round to the nearest hundredth
+    function createType6() {
+        // always display a decimal number
+        var k = Math.floor(Math.random()*2 + 3); // three or four decimal places
+        number = (Math.random()*(9999-1+1) + 1).toFixed(k);
+        
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + '<br />to the nearest hundredth.';
+        
+        answer = (number*1).toFixed(2);
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType6()
+    
+    // round to the nearest thousandth
+    function createType7() {
+        // always display four decimal places
+        number = (Math.random()*(9999-1+1) + 1).toFixed(4);
+        
+        var displayNumber = numberWithCommas(number);
+        
+        problem = displayNumber + ' <br />to the nearest thousandth.';
+        
+        answer = (number*1).toFixed(3);
+        displayAnswer = numberWithCommas(answer);
+        
+        // display problem
+        document.getElementById('problemSpace').innerHTML = problem;
+    } // end of function createType7()
+    */
+    
+    // check the answer and give feedback
+    function checkAnswer() {
+        // make sure the user has input an answer
+        if (document.forms[0].userAnswer.value == '') { // input is blank
+            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
+            document.getElementById('feedback').innerHTML = '<br />';
+            document.forms[0].userAnswer.focus(); // set focus to input box
+            return false;
+        }
+        
+        // display user's answer
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' +
+                                                            document.forms[0].userAnswer.value;
+        
+        // check the answer and give appropriate feedback
+        if (document.forms[0].userAnswer.value == displayAnswer) { // answer is correct
+            if (document.forms[0].playVideo.checked == true) {
+                playCorrectAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            document.forms[0].newProblem.focus();
+        }
+        else { // answer is incorrect
+            if (document.forms[0].playVideo.checked == true) {
+                playWrongAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
+            document.forms[0].userAnswer.focus();
+        }
+        return false;
+    } // end of function checkAnswer()
+    
+    // show the answer if the user is stuck
+    function showAnswer() {
+        document.getElementById('answer').innerHTML = 'Answer: ' + displayAnswer;
+    }
+    
+    // clear all text and input
+    function clearPage() {
+        clearAnswer();
+        document.getElementById('repeatAnswer').innerHTML = '&nbsp;';
+        document.getElementById('feedback').innerHTML = '&nbsp;';
+        document.getElementById('answer').innerHTML = '&nbsp;';        
+    }
+    // call the necessary functions when the page is loaded or reloaded
+    function loadPage() {
+        document.forms[0].userAnswer.focus(); // set focus to input box
+        selectType();
+        clearPage();
+        resetVideoFrame();
+    }
+    
+    // close the page
+    // APPEARS TO NOT WORK IN FIREFOX!!!
+    function closePage() {
+        if (document.forms[0].playVideo.checked == true) {
+            // let user know that the request is being processed
+            document.getElementById('closingMessage').innerHTML = 'closing...';
+            
+            // load video for the page closing
+            document.getElementById('videoSpace').innerHTML =
+                '<video id="noMore" width="240" height="132">' +
+                    '<source src="files/no more.mp4" type="video/mp4"></source>' +
+                '</video>';
+            noMore.play();
+            
+            noMore.onended = function() { // when the video ends
+                window.open("","_self").close(); // close the window
+                window.alert('Operation failed'); // if the window doesn't close
+                document.getElementById('closingMessage').innerHTML = ''; // reset text
+            }
+        }
+        else {
+            window.open("","_self").close(); // close the window
+            window.alert('Operation failed'); // if the window doesn't close
+        }
+        
+    }
+    // video feedback for correct answers
+    function playCorrectAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="reallyGoodAtMath" width="240" height="132">' +
+                        '<source src="../../files/really good at math.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(reallyGoodAtMath);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="smrt" width="240" height="132">' +
+                        '<source src="../../files/smrt.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(smrt);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    // video feedback for wrong answers
+    function playWrongAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                        '<video id="what" width="240" height="132">' +
+                            '<source src="../../files/what.mp4" type="video/mp4"></source>' +
+                        '</video>';
+                playVideo(what);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="notEvenClose" width="240" height="132">' +
+                        '<source src="../../files/not even close.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(notEvenClose);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // play whichever video is called
+    function playVideo(video) {
+        video.play();
+        video.onended = function() { // when the video ends
+            resetVideoFrame();    
+        }
+    }
+    
+    // set or reset the video frame to blank
+    function resetVideoFrame() {
+        document.getElementById('videoSpace').innerHTML =
+                '<video width="240" height="132"></video>';
+    }
+    /* ]]> */
+</script>
+</head>
+
+<body onload='loadPage();'>
+
+<div id="header">
+<h1>Mathletics Department</h1>
+<h3 style='font-style:italic;'>Get better at math</h3>
+</div>
+
+<div id="nav">
+<a href='../main.html'>Home</a><br />
+<a href='../whole_numbers_worksheets.html'>All worksheets</a><br />
+<a href='../whole_numbers_flashcards.html'>All flash cards</a><br />
+<a href='../whole_numbers_videos.html'>All videos</a>
+</div>
+
+<div id="section">
+<h2>Rounding Flashcards</h2>
+<form action=''>
+    <table>
+    <tr>
+    <td style='border:solid; width:40%;'>
+        Round the number to the specified place value.
+        <br /><br />
+        &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
+        <br /><br />
+        
+        <!-- input box for user's answer -->
+        Answer:<input type='text' name='userAnswer' size='10' />
+        <br /><br />
+        
+        <!-- keypad -->
+        <input type='button' name='seven' style='width: 50px' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width: 50px' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width: 50px' value='9' onclick='updateString("9");' />
+        <br />
+        <input type='button' name='four' style='width: 50px' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width: 50px' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width: 50px' value='6' onclick='updateString("6");' />
+        <br />
+        <input type='button' name='one' style='width: 50px' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width: 50px' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width: 50px' value='3' onclick='updateString("3");' />
+        <br />
+        <input type='button' name='zero' style='width: 50px' value='0' onclick='updateString("0");' />
+        <input type='button' name='point' style='width: 50px' value='.' onclick='updateString(".");' />
+        <input type='button' name='clear' style='width: 50px;' value='Clear' onclick='clearAnswer();' />
+        <br />
+        <br />
+        <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
+        <br />
+        
+        <span id='repeatAnswer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='feedback'><br /></span>
+        &nbsp;
+        <br />
+        
+        <!-- button to generate a new problem -->
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br />
+        
+        <!-- button to show correct answer -->
+        <input type='button' value='Show answer' style='height:30px;' onclick='showAnswer();' />
+        <br />
+        
+        <span id='answer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='closingMessage'>&nbsp;</span>
+    </td>
+    
+    <td style='margin-left:15px; border:none;'>
+        <!-- options -->
+        <span>
+            Round to the nearest...<br />
+            <input type='checkbox' name='type1' checked='checked' />thousand<br />
+            <input type='checkbox' name='type2' checked='checked' />hundred<br />
+            <input type='checkbox' name='type3' checked='checked' />ten<br />
+            
+            <!-- decimals need to have display fixed; no commas should be displayed after the decimal
+            Decimals - Round to the nearest...<br />
+            <input type='checkbox' name='type4' />whole number<br />
+            <input type='checkbox' name='type5' />tenth<br />
+            <input type='checkbox' name='type6' />hundredth<br />
+            <input type='checkbox' name='type7' />thousandth<br />
+            -->
+            
+        </span>
+        <br />
+        <!-- button to generate a new problem -->
+        <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br /><br />
+        
+        <!-- checkbox for video feedback -->
+        <input type='checkbox' name='playVideo' />Play video feedback
+        <br />
+        
+        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
+        
+    </td>
+    </tr>
+    </table>
+</form>
+
+</div>
+
+<div id="footer">
+<a href='main.html'>Home</a>
+</div>
+
+</body>
+</html>
