@@ -229,7 +229,6 @@ span {
         if (document.forms[0].userAnswer.value == '') { // input is blank
             document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
             document.getElementById('feedback').innerHTML = '<br />';
-            document.forms[0].userAnswer.focus(); // set focus to input box
             return false;
         }
         
@@ -250,7 +249,6 @@ span {
                 playWrongAnswer();
             }
             document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
-            document.forms[0].userAnswer.focus();
         }
         return false;
     } // end of function checkAnswer()
@@ -269,38 +267,11 @@ span {
     }
     // call the necessary functions when the page is loaded or reloaded
     function loadPage() {
-        document.forms[0].userAnswer.focus(); // set focus to input box
         selectType();
         clearPage();
         resetVideoFrame();
     }
     
-    // close the page
-    // APPEARS TO NOT WORK IN FIREFOX!!!
-    function closePage() {
-        if (document.forms[0].playVideo.checked == true) {
-            // let user know that the request is being processed
-            document.getElementById('closingMessage').innerHTML = 'closing...';
-            
-            // load video for the page closing
-            document.getElementById('videoSpace').innerHTML =
-                '<video id="noMore" width="240" height="132">' +
-                    '<source src="files/no more.mp4" type="video/mp4"></source>' +
-                '</video>';
-            noMore.play();
-            
-            noMore.onended = function() { // when the video ends
-                window.open("","_self").close(); // close the window
-                window.alert('Operation failed'); // if the window doesn't close
-                document.getElementById('closingMessage').innerHTML = ''; // reset text
-            }
-        }
-        else {
-            window.open("","_self").close(); // close the window
-            window.alert('Operation failed'); // if the window doesn't close
-        }
-        
-    }
     // video feedback for correct answers
     function playCorrectAnswer() {
         var numVideos = 2;

@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Flashcards - Math Facts</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
+<style type='text/css'>
+span {
+    background-color: inherit;
+    font-weight: bold;
+}
+</style>
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    // global variables
+    var inputString; // holds the value input by the user
+    var firstNum;
+    var secondNum;
+    var answer; // holds the answer
+    var numAttempts = 0; // number of attempted problems
+    var numCorrect = 0; // number of correctly answered questions
+    var pctCorrect; // percentage of correct answers
+    var counter; // keep track of how many times an answer is submitted for a given problem
+    
+    // get numbers for the new problem
+    function generateNumbers() {
+        firstNum = Math.floor(Math.random() * 10); // random number between 0 and 9
+        secondNum = Math.floor(Math.random() * 10); // random number between 0 and 9
+        
+        counter = 0; // no answers have been submitted for the given problem
+    }
+    
+    // determine what kind of question to display
+    function selectQuestionType() {
+        // local variables
+        var numSelected = 0; // number of selected operations; reset to zero each time the function is called
+        var question = new Array(); // array to hold question types
+        var i; // will hold a random number
+        
+        // add checked operations to question array
+        if (document.forms[0].addition.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'addition';
+        }
+        if (document.forms[0].subtraction.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'subtraction';
+        }
+        if (document.forms[0].multiplication.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'multiplication';
+        }
+        if (document.forms[0].division.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'division';
+        }
+        
+        // randomly select which type of operation to do
+        i = Math.floor(Math.random() * numSelected);
+        if (question[i] == 'addition') {
+            additionProblem();
+        }
+        else if (question[i] == 'subtraction') {
+            subtractionProblem();
+        }
+        else if (question[i] == 'multiplication') {
+            multiplicationProblem();
+        }
+        else if (question[i] == 'division') {
+            divisionProblem();
+        }
+        else if (numSelected == 0) {
+            window.alert("Please select at least one operation.");
+        }
+        else {
+            document.getElementById('repeatAnswer').innerHTML = "<br />";
+            document.getElementById('feedback').innerHTML = "<br />";
+            document.getElementById('answer').innerHTML = "<br />";
+            clearAnswer(); // reset the input box
+        }
+    }
+    
+    // create an addition problem
+    function additionProblem() {
+        var problem = firstNum + ' + ' + secondNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = firstNum + secondNum;
+    }
+    
+    // create a subtraction problem
+    function subtractionProblem() {
+        var thirdNum = firstNum + secondNum;
+        var problem = thirdNum + ' - ' + secondNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = firstNum;
+    }
+    
+    // create a multiplication problem
+    function multiplicationProblem() {
+        var problem = firstNum + ' &times; ' + secondNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = firstNum * secondNum;
+    }
+    
+    // create a division problem
+    function divisionProblem() {
+        // make sure it's not zero divided by zero
+        while (firstNum == 0) { // if the first number is zero
+            generateNumbers(); // get new numbers
+        }
+        // use the thirdNum variable to make sure our division will work out to an integer
+        var thirdNum = firstNum * secondNum;
+        var problem = thirdNum + ' &divide; ' + firstNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = secondNum;
+    }
+    // check the answer and give feedback
+    function checkAnswer() {
+        // make sure user inputs an answer
+        if (document.forms[0].userAnswer.value == '') { // input is blank
+            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
+            document.getElementById('feedback').innerHTML = '<br />';
+            return false;
+        }
+        
+        // keep track of stats
+        counter++; // increment the number of submitted answers for the given problem
+        
+        // display user's answer               
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
+        // give appropriate feedback
+        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+            // track stats
+            if (counter == 1) {
+                numCorrect++;
+            }
+            if (document.forms[0].playVideo.checked == true) {
+                playCorrectAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            document.forms[0].newProblem.focus();
+        }
+        else { // answer is incorrect
+            if (document.forms[0].playVideo.checked == true) {
+                playWrongAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
+        }
+        
+        pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';
+        
+        return false;
+    }
+    
+    // allow numberpad to type in answer
+    function updateString(value) {
+        inputString += value;
+        document.forms[0].userAnswer.value = inputString;
+    }
+ 
+    // clear button to reset the form
+    function clearAnswer() {
+        document.forms[0].userAnswer.value = "";
+        inputString = "";
+    }
+    
+    // show the correct answer
+    function showAnswer() {
+        document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+    }
+    // set or reset the video frame to blank
+    function resetVideoFrame() {
+        document.getElementById('videoSpace').innerHTML =
+                '<video width="240" height="132"></video>';
+    }
+    
+    // reset the statistics
+    function resetStats() {
+        numAttempts = 0;
+        numCorrect = 0;
+        
+        document.getElementById('attempted').innerHTML = '';
+        document.getElementById('correct').innerHTML = '';
+        document.getElementById('percent').innerHTML = '';
+    }
+    // call necessary functions when page loads
+    function loadPage() {
+        if (counter != 0) {
+            numAttempts++; //increment the number of attempted problems
+        }
+        clearAnswer();
+        generateNumbers();
+        document.getElementById('repeatAnswer').innerHTML = '';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('answer').innerHTML = '';
+        selectQuestionType(); // choose from the list of selected operations
+        resetVideoFrame();
+    }
+    // video feedback for correct answers
+    function playCorrectAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="reallyGoodAtMath" width="240" height="132">' +
+                        '<source src="../../files/really good at math.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(reallyGoodAtMath);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="smrt" width="240" height="132">' +
+                        '<source src="../../files/smrt.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(smrt);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    // video feedback for wrong answers
+    function playWrongAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                        '<video id="what" width="240" height="132">' +
+                            '<source src="../../files/what.mp4" type="video/mp4"></source>' +
+                        '</video>';
+                playVideo(what);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="notEvenClose" width="240" height="132">' +
+                        '<source src="../../files/not even close.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(notEvenClose);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // play whichever video is called
+    function playVideo(video) {
+        video.play();
+        video.onended = function() { // when the video ends
+            resetVideoFrame();    
+        }
+    }
+    /* ]]> */
+</script>
+</head>
+
+<body onload='loadPage();'>
+
+<div id="header">
+<h1>Mathletics Department</h1>
+<h3 style='font-style:italic;'>Get better at math</h3>
+</div>
+
+<div id="nav">
+<a href='../main.html'>Home</a><br />
+<a href='../whole_numbers_worksheets.html'>All worksheets</a><br />
+<a href='../whole_numbers_flashcards.html'>All flash cards</a><br />
+<a href='../whole_numbers_videos.html'>All videos</a>
+</div>
+
+<div id="section">
+<h2>Math Facts Flash Cards (0 - 9)</h2>
+<form action=''>
+    <table>
+    <tr>
+    <td style='border:solid; width:40%;'>
+        Perform the operation:
+        <br /><br />
+        &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
+        <br /><br />
+        
+        <!-- input box for user's answer -->
+        Answer:<input type='text' name='userAnswer' size='4' />
+        <br /><br />
+        
+        <!-- keypad -->
+        <input type='button' name='seven' style='width:60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width:60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width:60px; height:30px;' value='9' onclick='updateString("9");' />
+        <br />
+        <input type='button' name='four' style='width:60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width:60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width:60px; height:30px;' value='6' onclick='updateString("6");' />
+        <br />
+        <input type='button' name='one' style='width:60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
+        <br />
+        <input type='button' name='zero' style='width:92px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='clear' style='width:92px; height:30px;' value='Clear' onclick='clearAnswer();' />
+        <br />
+        <br />
+        <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
+        <br />
+        
+        <span id='repeatAnswer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='feedback'><br /></span>
+        &nbsp;
+        <br />
+        
+        <!-- button to generate a new problem -->
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br />
+        
+        <!-- button to show correct answer -->
+        <input type='button' value='Show answer' style='height:30px;' onclick='showAnswer();' />
+        <br />
+        
+        <span id='answer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='closingMessage'>&nbsp;</span>
+    </td>
+    
+    <td style='margin-left:15px; border:none;'>
+        <!-- stats -->
+        <span style='text-decoration:underline;'>Statistics</span><br />
+        Problems attempted: <span id='attempted'>&nbsp;</span><br />
+        Number correct: <span id='correct'>&nbsp;</span><br />
+        Percent correct: <span id='percent'>&nbsp;</span><br />
+        <input type='button' value='Reset' onclick='resetStats()' /><br /><br />
+        
+        <!-- options -->        
+        <span>
+            Choose which operation(s) to practice<br />
+            <input type='checkbox' name='addition' checked='checked' />Add<br />
+            <input type='checkbox' name='subtraction' />Subtract<br />
+            <input type='checkbox' name='multiplication' />Multiply<br />
+            <input type='checkbox' name='division' />Divide<br />
+        </span>
+        <br />
+        <!-- button to generate a new problem -->
+        <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br /><br />
+        
+        <!-- checkbox for video feedback -->
+        <input type='checkbox' name='playVideo' />Play video feedback
+        <br />
+        
+        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
+        
+    </td>
+    </tr>
+    </table>
+</form>
+
+</div>
+
+<div id="footer">
+<a href='main.html'>Home</a>
+</div>
+
+</body>
+</html>
