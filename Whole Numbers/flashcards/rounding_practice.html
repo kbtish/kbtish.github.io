@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Flashcards - Math Facts</title>
+<title>Flashcards - Rounding</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -20,6 +20,9 @@ span {
     var answer; // holds the answer
     var displayAnswer; //holds the answer displayed with commas, if needed
     var problem; // holds text for the problem
+    var numAttempts = 0; // number of attempted problems
+    var numCorrect = 0; // number of correctly answered questions
+    var counter; // keep track of how many times an answer is submitted for a given problem
     
     // display large numbers with commas
     function numberWithCommas(x) {
@@ -82,6 +85,8 @@ span {
         if (numSelected == 0) {
             window.alert('Please select at least one problem type.');
         }
+        
+        counter = 0; // no answers have been submitted for the given problem
         
         // randomly select which problem type to display
         i = Math.floor(Math.random() * numSelected);
@@ -232,12 +237,18 @@ span {
             return false;
         }
         
+        counter++; // increment the number of submitted answers for the given problem
+        
         // display user's answer
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' +
                                                             document.forms[0].userAnswer.value;
         
         // check the answer and give appropriate feedback
         if (document.forms[0].userAnswer.value == displayAnswer) { // answer is correct
+            if (counter == 1) {
+                numCorrect++;
+            }
+            
             if (document.forms[0].playVideo.checked == true) {
                 playCorrectAnswer();
             }
@@ -250,6 +261,12 @@ span {
             }
             document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
         }
+        
+        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';
+        
         return false;
     } // end of function checkAnswer()
     
@@ -265,8 +282,41 @@ span {
         document.getElementById('feedback').innerHTML = '&nbsp;';
         document.getElementById('answer').innerHTML = '&nbsp;';        
     }
+    
+    // reset the statistics
+    function resetStats() {
+        numAttempts = 0;
+        numCorrect = 0;
+        counter = 1;
+        
+        document.getElementById('attempted').innerHTML = '';
+        document.getElementById('correct').innerHTML = '';
+        document.getElementById('percent').innerHTML = '';
+        
+        loadPage();
+    }
+    
+    // hide the statistics
+    function hideStats() {
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('resetBtn').style.visibility = 'hidden';
+        document.getElementById('hideStatsBtn').style.visibility = 'hidden';
+        document.getElementById('showStatsBtn').style.display = 'inline';
+    }
+    
+    // show the statistics
+    function showStats() {
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('resetBtn').style.visibility = 'visible';
+        document.getElementById('hideStatsBtn').style.visibility = 'visible';
+        document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
     // call the necessary functions when the page is loaded or reloaded
     function loadPage() {
+        if (counter != 0) {
+            numAttempts++; //increment the number of attempted problems
+        }
         selectType();
         clearPage();
         resetVideoFrame();
@@ -357,7 +407,7 @@ span {
 <form action=''>
     <table>
     <tr>
-    <td style='border:solid; width:40%;'>
+    <td style='border:solid; width:35%; padding:5px;'>
         Round the number to the specified place value.
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
@@ -368,21 +418,21 @@ span {
         <br /><br />
         
         <!-- keypad -->
-        <input type='button' name='seven' style='width: 50px' value='7' onclick='updateString("7");' />
-        <input type='button' name='eight' style='width: 50px' value='8' onclick='updateString("8");' />
-        <input type='button' name='nine' style='width: 50px' value='9' onclick='updateString("9");' />
+        <input type='button' name='seven' style='width: 60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width: 60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width: 60px; height:30px;' value='9' onclick='updateString("9");' />
         <br />
-        <input type='button' name='four' style='width: 50px' value='4' onclick='updateString("4");' />
-        <input type='button' name='five' style='width: 50px' value='5' onclick='updateString("5");' />
-        <input type='button' name='six' style='width: 50px' value='6' onclick='updateString("6");' />
+        <input type='button' name='four' style='width: 60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width: 60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width: 60px; height:30px;' value='6' onclick='updateString("6");' />
         <br />
-        <input type='button' name='one' style='width: 50px' value='1' onclick='updateString("1");' />
-        <input type='button' name='two' style='width: 50px' value='2' onclick='updateString("2");' />
-        <input type='button' name='three' style='width: 50px' value='3' onclick='updateString("3");' />
+        <input type='button' name='one' style='width: 60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width: 60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width: 60px; height:30px;' value='3' onclick='updateString("3");' />
         <br />
-        <input type='button' name='zero' style='width: 50px' value='0' onclick='updateString("0");' />
-        <input type='button' name='point' style='width: 50px' value='.' onclick='updateString(".");' />
-        <input type='button' name='clear' style='width: 50px;' value='Clear' onclick='clearAnswer();' />
+        <input type='button' name='zero' style='width: 60px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='point' style='width: 60px; height:30px;' value='.' onclick='updateString(".");' />
+        <input type='button' name='clear' style='width: 60px; height:30px;' value='Clear' onclick='clearAnswer();' />
         <br />
         <br />
         <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
@@ -411,13 +461,25 @@ span {
         <span id='closingMessage'>&nbsp;</span>
     </td>
     
-    <td style='margin-left:15px; border:none;'>
+    <td style='padding-right:160px; margin-left:0px; border:none; text-align:right;'>
+        <!-- stats -->
+        <div id='stats'>
+            <span style='text-decoration:underline;'>Statistics</span><br />
+            Problems attempted: <span id='attempted'>&nbsp;</span><br />
+            Number correct: <span id='correct'>&nbsp;</span><br />
+            Percent correct: <span id='percent'>&nbsp;</span><br />
+        </div>
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
+        <input type='button' id='resetBtn' value='Reset' style='height:30px;' onclick='resetStats()' />
+        <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
+        <br /><br />
+        
         <!-- options -->
         <span>
             Round to the nearest...<br />
-            <input type='checkbox' name='type1' checked='checked' />thousand<br />
-            <input type='checkbox' name='type2' checked='checked' />hundred<br />
-            <input type='checkbox' name='type3' checked='checked' />ten<br />
+            thousand<input type='checkbox' name='type1' checked='checked' /><br />
+            hundred<input type='checkbox' name='type2' checked='checked' /><br />
+            ten<input type='checkbox' name='type3' checked='checked' /><br />
             
             <!-- decimals need to have display fixed; no commas should be displayed after the decimal
             Decimals - Round to the nearest...<br />

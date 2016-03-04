@@ -21,7 +21,6 @@ span {
     var answer; // holds the answer
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
-    var pctCorrect; // percentage of correct answers
     var counter; // keep track of how many times an answer is submitted for a given problem
     
     // get numbers for the new problem
@@ -125,17 +124,16 @@ span {
             return false;
         }
         
-        // keep track of stats
         counter++; // increment the number of submitted answers for the given problem
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
         // give appropriate feedback
         if (document.forms[0].userAnswer.value == answer) { // answer is correct
-            // track stats
             if (counter == 1) {
                 numCorrect++;
             }
+            
             if (document.forms[0].playVideo.checked == true) {
                 playCorrectAnswer();
             }
@@ -149,7 +147,7 @@ span {
             document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
         }
         
-        pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
         document.getElementById('attempted').innerHTML = numAttempts;
         document.getElementById('correct').innerHTML = numCorrect;
         document.getElementById('percent').innerHTML = pctCorrect + '%';
@@ -183,11 +181,31 @@ span {
     function resetStats() {
         numAttempts = 0;
         numCorrect = 0;
+        counter = 1;
         
         document.getElementById('attempted').innerHTML = '';
         document.getElementById('correct').innerHTML = '';
         document.getElementById('percent').innerHTML = '';
+        
+        loadPage();
     }
+    
+    // hide the statistics
+    function hideStats() {
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('resetBtn').style.visibility = 'hidden';
+        document.getElementById('hideStatsBtn').style.visibility = 'hidden';
+        document.getElementById('showStatsBtn').style.display = 'inline';
+    }
+    
+    // show the statistics
+    function showStats() {
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('resetBtn').style.visibility = 'visible';
+        document.getElementById('hideStatsBtn').style.visibility = 'visible';
+        document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
     // call necessary functions when page loads
     function loadPage() {
         if (counter != 0) {
@@ -280,7 +298,7 @@ span {
 <form action=''>
     <table>
     <tr>
-    <td style='border:solid; width:40%;'>
+    <td style='border:solid; width:45%; padding:5px;'>
         Perform the operation:
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
@@ -333,21 +351,26 @@ span {
         <span id='closingMessage'>&nbsp;</span>
     </td>
     
-    <td style='margin-left:15px; border:none;'>
+    <td style='margin-left:15px; border:none; text-align:right;'>
         <!-- stats -->
-        <span style='text-decoration:underline;'>Statistics</span><br />
-        Problems attempted: <span id='attempted'>&nbsp;</span><br />
-        Number correct: <span id='correct'>&nbsp;</span><br />
-        Percent correct: <span id='percent'>&nbsp;</span><br />
-        <input type='button' value='Reset' onclick='resetStats()' /><br /><br />
+        <div id='stats'>
+            <span style='text-decoration:underline;'>Statistics</span><br />
+            Problems attempted: <span id='attempted'>&nbsp;</span><br />
+            Number correct: <span id='correct'>&nbsp;</span><br />
+            Percent correct: <span id='percent'>&nbsp;</span><br />
+        </div>
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
+        <input type='button' id='resetBtn' value='Reset' style='height:30px;' onclick='resetStats()' />
+        <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
+        <br /><br />
         
         <!-- options -->        
         <span>
-            Choose which operation(s) to practice<br />
-            <input type='checkbox' name='addition' checked='checked' />Add<br />
-            <input type='checkbox' name='subtraction' />Subtract<br />
-            <input type='checkbox' name='multiplication' />Multiply<br />
-            <input type='checkbox' name='division' />Divide<br />
+            Operation(s) to practice<br />
+            Add<input type='checkbox' name='addition' checked='checked' /><br />
+            Subtract<input type='checkbox' name='subtraction' /><br />
+            Multiply<input type='checkbox' name='multiplication' /><br />
+            Divide<input type='checkbox' name='division' /><br />
         </span>
         <br />
         <!-- button to generate a new problem -->

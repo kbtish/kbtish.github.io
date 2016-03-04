@@ -23,6 +23,9 @@ span {
     var maxValue; // maximum value of an addend
     var answer; // holds the answer
     var numAddends; // how many addends to display for the problem (either 2 or 3)
+    var numAttempts = 0; // number of attempted problems
+    var numCorrect = 0; // number of correctly answered questions
+    var counter; // keep track of how many times an answer is submitted for a given problem
     
     // get numbers for the new problem
     function generateNumbers() {        
@@ -30,6 +33,7 @@ span {
             firstNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
             secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
             thirdNum = 0;
+            
         }
         else {
             numAddends = parseInt(document.forms[0].numAddends.value);
@@ -79,8 +83,11 @@ span {
             
                 thirdNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number
             }   
-        }     
-    }
+        }
+        
+        counter = 0; // no answers have been submitted for the given problem
+        
+    } // end of generateNumbers()
 
     // display large numbers with commas
     function numberWithCommas(x) {
@@ -119,17 +126,24 @@ span {
             document.getElementById('feedback').innerHTML = '<br />';
             return false;
         }
+        
+        counter++; // increment the number of submitted answers for the given problem
+        
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
+        
         // give appropriate feedback
         if (inputString == answer) { // answer is correct
+            // track stats
+            if (counter == 1) {
+                numCorrect++;
+            }
+            
             if (document.forms[0].playVideo.checked == true) {
                 playCorrectAnswer();
             }
             document.getElementById('feedback').innerHTML = 'Correct!';
             document.forms[0].newProblem.focus();
-            
-            return false;
         }
         else { // answer is incorrect
             if (document.forms[0].playVideo.checked == true) {
@@ -137,6 +151,12 @@ span {
             }
             document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
         }
+        
+        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';
+        
         return false;
     }
     
@@ -161,6 +181,35 @@ span {
     function resetVideoFrame() {
         document.getElementById('videoSpace').innerHTML =
                 '<video width="240" height="132"></video>';
+    }
+    
+    // reset the statistics
+    function resetStats() {
+        numAttempts = 0;
+        numCorrect = 0;
+        counter = 1;
+        
+        document.getElementById('attempted').innerHTML = '';
+        document.getElementById('correct').innerHTML = '';
+        document.getElementById('percent').innerHTML = '';
+        
+        loadPage();
+    }
+    
+    // hide the statistics
+    function hideStats() {
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('resetBtn').style.visibility = 'hidden';
+        document.getElementById('hideStatsBtn').style.visibility = 'hidden';
+        document.getElementById('showStatsBtn').style.display = 'inline';
+    }
+    
+    // show the statistics
+    function showStats() {
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('resetBtn').style.visibility = 'visible';
+        document.getElementById('hideStatsBtn').style.visibility = 'visible';
+        document.getElementById('showStatsBtn').style.display = 'none';
     }
     
     // hide or show the selection list for the third number
@@ -190,6 +239,9 @@ span {
     }
     // call necessary functions when page loads
     function loadPage() {
+        if (counter != 0) {
+            numAttempts++; //increment the number of attempted problems
+        }
         clearAnswer();
         generateNumbers();
         generateProblem();
@@ -333,6 +385,18 @@ span {
     </td>
     
     <td style='margin-left:15px; border:none; text-align:right;'>
+        <!-- stats -->
+        <div id='stats'>
+            <span style='text-decoration:underline;'>Statistics</span><br />
+            Problems attempted: <span id='attempted'>&nbsp;</span><br />
+            Number correct: <span id='correct'>&nbsp;</span><br />
+            Percent correct: <span id='percent'>&nbsp;</span><br />
+        </div>
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
+        <input type='button' id='resetBtn' value='Reset' style='height:30px;' onclick='resetStats()' />
+        <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
+        <br /><br />
+        
         <!-- options -->
         <span>
             Facts only (0-9)
