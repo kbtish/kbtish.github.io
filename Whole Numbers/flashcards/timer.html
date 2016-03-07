@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whole Numbers - Main Page</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel='stylesheet' type='text/css' href='whole_numbers_template.css' />
+<style type='text/css'>
+
+</style>
+
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    var time = 60 // 60 seconds on the timer
+    var count; // will hold the time in seconds
+    var counter; // object to keep the time
+    
+    function startTimer() {
+        count = time - 1; // set the time in seconds
+        
+        document.getElementById('startBtn').style.display = 'none'; // hide the start button
+        document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second      
+    }
+    
+    function stopTimer() {
+        clearInterval(counter); // stop the timer
+        
+        document.getElementById('startBtn').style.display = 'inline'; // show the start button
+        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        
+        document.getElementById('timer').innerHTML = time + ' seconds';
+    }
+    
+    function timer() {
+        document.getElementById("timer").innerHTML = count + " seconds";
+        
+        count = count - 1;
+        if (count < 0) // when time is up...
+        {
+           clearInterval(counter); // stop the timer
+           
+           window.alert('Time\'s up!'); // display a message
+           
+           return;
+        }
+    }
+    /* ]]> */
+</script>
+</head>
+
+<body onload="document.getElementById('timer').innerHTML = time + ' seconds';">
+
+<div id="header">
+<h1>Mathletics Department</h1>
+<h3 style='font-style:italic;'>Get better at math</h3>
+</div>
+
+<div id="section">
+    <span id="timer"></span>
+    <br />
+    <input type='button' id='startBtn' value='Start' onclick='startTimer();' />
+    <input type='button' id='stopBtn' value='Stop' style='display:none;' onclick='stopTimer();' />
+</div>
+
+<div id="footer">
+<a href='main.html'>Home</a>
+</div>
+
+</body>
+</html>
