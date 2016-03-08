@@ -30,6 +30,7 @@ span {
     var time = 60; // seconds on the timer
     var count; // will hold the number of seconds
     var counter; // object/function to act as a timer
+    var running = false; // tells whether or not the timer is running
     
     // get numbers for the new problem
     function generateNumbers() {        
@@ -243,6 +244,8 @@ span {
     function startTimer() {
         resetStats(); // reset stats and get a new problem
         
+        running = true;
+        
         count = time - 1; // set the time in seconds
         
         counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
@@ -267,11 +270,11 @@ span {
         document.getElementById("timer").innerHTML = count + " seconds<br />";
         
         count = count - 1;
-        if (count < 0) { // when time is up...
-            stopTimer();
-           
+        if (count < 0) { // when time is up...           
             window.alert('Time\'s up!'); // display a message
            
+            stopTimer();
+            
             return;
         }
     } // end of timer()
@@ -279,6 +282,7 @@ span {
     // stop the timer
     function stopTimer() {
         clearInterval(counter); // stop the timer
+        running = false;
         
         document.getElementById('startBtn').style.display = 'inline'; // show the start button
         document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
@@ -302,7 +306,9 @@ span {
             if (submissions != 0) {
                numAttempts++; //increment the number of attempted problems
             }
-            document.getElementById('timer').innerHTML = time + ' seconds<br />';
+            if (running == false) {
+                document.getElementById('timer').innerHTML = time + ' seconds<br />';
+            }
             clearAnswer();
             generateNumbers();
             generateProblem();
