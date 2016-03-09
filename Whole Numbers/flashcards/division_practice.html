@@ -258,11 +258,13 @@ span {
         document.getElementById('hideStatsBtn').disabled = true;
         document.getElementById('resetBtn').disabled = true;
         document.getElementById('showStatsBtn').disabled = true;
+        document.getElementById('playVideo').disabled = true;
+        document.getElementById('playVideo').checked = false;
+        
         document.getElementById('factsOnly').disabled = true;
         document.getElementById('remainder').disabled = true;
         document.getElementById('firstDigitsSelect').disabled = true;
         document.getElementById('secondDigitsSelect').disabled = true;
-        document.getElementById('playVideo').disabled = true;    
     }
     
     // more running of the timer
@@ -291,11 +293,12 @@ span {
         document.getElementById('hideStatsBtn').disabled = false;
         document.getElementById('resetBtn').disabled = false;
         document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('playVideo').disabled = false;
+        
         document.getElementById('factsOnly').disabled = false;
         document.getElementById('remainder').disabled = false;
         document.getElementById('firstDigitsSelect').disabled = false;
         document.getElementById('secondDigitsSelect').disabled = false;
-        document.getElementById('playVideo').disabled = false;
         
         document.getElementById('timer').innerHTML = time + ' seconds<br />'; // display the timer
     }

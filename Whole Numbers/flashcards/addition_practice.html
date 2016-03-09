@@ -25,7 +25,11 @@ span {
     var numAddends; // how many addends to display for the problem (either 2 or 3)
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
-    var counter; // keep track of how many times an answer is submitted for a given problem
+    var submissions; // keep track of how many times an answer is submitted for a given problem
+    var time = 60; // seconds on the timer
+    var count; // will hold the number of seconds
+    var counter; // object/function to act as a timer
+    var running = false; // tells whether or not the timer is running
     
     // get numbers for the new problem
     function generateNumbers() {        
@@ -85,7 +89,7 @@ span {
             }   
         }
         
-        counter = 0; // no answers have been submitted for the given problem
+        submissions = 0; // no answers have been submitted for the given problem
         
     } // end of generateNumbers()
 
@@ -127,7 +131,7 @@ span {
             return false;
         }
         
-        counter++; // increment the number of submitted answers for the given problem
+        submissions++; // increment the number of submitted answers for the given problem
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
@@ -135,7 +139,7 @@ span {
         // give appropriate feedback
         if (inputString == answer) { // answer is correct
             // track stats
-            if (counter == 1) {
+            if (submissions == 1) {
                 numCorrect++;
             }
             
@@ -187,7 +191,7 @@ span {
     function resetStats() {
         numAttempts = 0;
         numCorrect = 0;
-        counter = 1;
+        submissions = 1;
         
         document.getElementById('attempted').innerHTML = '';
         document.getElementById('correct').innerHTML = '';
@@ -210,6 +214,71 @@ span {
         document.getElementById('resetBtn').style.visibility = 'visible';
         document.getElementById('hideStatsBtn').style.visibility = 'visible';
         document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
+    // run the timer; see also timer() function
+    function startTimer() {
+        resetStats(); // reset stats and get a new problem
+        
+        running = true;
+        
+        count = time - 1; // set the time in seconds
+        
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
+        
+        document.getElementById('timer').style.display = 'inline'; // display the time remaining
+        document.getElementById('startBtn').style.display = 'none'; // hide the Start button
+        document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        
+        // disable options
+        document.getElementById('hideStatsBtn').disabled = true;
+        document.getElementById('resetBtn').disabled = true;
+        document.getElementById('showStatsBtn').disabled = true;
+        document.getElementById('factsOnly').disabled = true;
+        document.getElementById('playVideo').disabled = true;
+        document.getElementById('playVideo').checked = false;
+        
+        document.getElementById('numAddendsSelect').disabled = true;
+        document.getElementById('firstDigitsSelect').disabled = true;
+        document.getElementById('secondDigitsSelect').disabled = true;
+        document.getElementById('thirdDigitsSelect').disabled = true;
+    }
+    
+    // more running of the timer
+    function timer() {
+        document.getElementById("timer").innerHTML = count + " seconds<br />";
+        
+        count = count - 1;
+        if (count < 0) { // when time is up...           
+            window.alert('Time\'s up!'); // display a message
+           
+            stopTimer();
+            
+            return;
+        }
+    } // end of timer()
+    
+    // stop the timer
+    function stopTimer() {
+        clearInterval(counter); // stop the timer
+        running = false;
+        
+        document.getElementById('startBtn').style.display = 'inline'; // show the start button
+        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        
+        // enable options
+        document.getElementById('hideStatsBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('factsOnly').disabled = false;
+        document.getElementById('playVideo').disabled = false;
+        
+        document.getElementById('numAddendsSelect').disabled = false;
+        document.getElementById('firstDigitsSelect').disabled = false;
+        document.getElementById('secondDigitsSelect').disabled = false;
+        document.getElementById('thirdDigitsSelect').disabled = false;
+        
+        document.getElementById('timer').innerHTML = time + ' seconds<br />'; // display the timer
     }
     
     // hide or show the selection list for the third number
@@ -239,8 +308,11 @@ span {
     }
     // call necessary functions when page loads
     function loadPage() {
-        if (counter != 0) {
+        if (submissions != 0) {
             numAttempts++; //increment the number of attempted problems
+        }
+        if (running == false) {
+            document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }
         clearAnswer();
         generateNumbers();
@@ -385,6 +457,14 @@ span {
     </td>
     
     <td style='margin-left:15px; border:none; text-align:right;'>
+        <!-- timer -->
+        <span>One-minute timer</span>
+        <br />
+        <div id='timer'></div>
+        <input type='button' id='startBtn' value='Start' onclick='startTimer();' />
+        <input type='button' id='stopBtn' value='Stop' style='display:none;' onclick='stopTimer();' />
+        <br /><br />
+        
         <!-- stats -->
         <div id='stats'>
             <span style='text-decoration:underline;'>Statistics</span><br />
@@ -400,13 +480,13 @@ span {
         <!-- options -->
         <span>
             Facts only (0-9)
-            <input type='checkbox' name='factsOnly' onchange='changeVisibility();' />
+            <input type='checkbox' name='factsOnly' id='factsOnly' onchange='changeVisibility();' />
         </span>
         <br /><br />
         
         <span id='numAddends'>
             Number of addends
-            <select name='numAddends' onchange='changeVisibility();'>
+            <select name='numAddends' id='numAddendsSelect' onchange='changeVisibility();'>
                 <option value='2'>2</option>
                 <option value='3'>3</option>
             </select>
@@ -415,7 +495,7 @@ span {
         
         <span id='firstDigits'>
             Digits for the first number
-            <select name='firstDigits'>
+            <select name='firstDigits' id='firstDigitsSelect'>
                 <option value='1'>1</option>
                 <option value='2' selected='selected'>2</option>
                 <option value='3'>3</option>
@@ -429,7 +509,7 @@ span {
         
         <span id='secondDigits'>
             Digits for the second number
-            <select name='secondDigits'>
+            <select name='secondDigits' id='secondDigitsSelect'>
                 <option value='1'>1</option>
                 <option value='2' selected='selected'>2</option>
                 <option value='3'>3</option>
@@ -443,7 +523,7 @@ span {
         
         <span id='thirdDigits'>
             Digits for the third number
-            <select name='thirdDigits'>
+            <select name='thirdDigits' id='thirdDigitsSelect'>
                 <option value='1'>1</option>
                 <option value='2'>2</option>
                 <option value='3'>3</option>
@@ -459,7 +539,7 @@ span {
         <br /><br />
         
         <!-- checkbox for video feedback -->
-        <input type='checkbox' name='playVideo' />Play video feedback
+        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
         <br />
         
         <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>

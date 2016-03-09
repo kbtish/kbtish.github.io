@@ -22,7 +22,11 @@ span {
     var problem; // holds text for the problem
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
-    var counter; // keep track of how many times an answer is submitted for a given problem
+    var submissions; // keep track of how many times an answer is submitted for a given problem
+    var time = 60; // seconds on the timer
+    var count; // will hold the number of seconds
+    var counter; // object/function to act as a timer
+    var running = false; // tells whether or not the timer is running
     
     // display large numbers with commas
     function numberWithCommas(x) {
@@ -86,7 +90,7 @@ span {
             window.alert('Please select at least one problem type.');
         }
         
-        counter = 0; // no answers have been submitted for the given problem
+        submissions = 0; // no answers have been submitted for the given problem
         
         // randomly select which problem type to display
         i = Math.floor(Math.random() * numSelected);
@@ -237,7 +241,7 @@ span {
             return false;
         }
         
-        counter++; // increment the number of submitted answers for the given problem
+        submissions++; // increment the number of submitted answers for the given problem
         
         // display user's answer
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' +
@@ -245,7 +249,7 @@ span {
         
         // check the answer and give appropriate feedback
         if (document.forms[0].userAnswer.value == displayAnswer) { // answer is correct
-            if (counter == 1) {
+            if (submissions == 1) {
                 numCorrect++;
             }
             
@@ -287,7 +291,7 @@ span {
     function resetStats() {
         numAttempts = 0;
         numCorrect = 0;
-        counter = 1;
+        submissions = 1;
         
         document.getElementById('attempted').innerHTML = '';
         document.getElementById('correct').innerHTML = '';
@@ -312,10 +316,76 @@ span {
         document.getElementById('showStatsBtn').style.display = 'none';
     }
     
+    // run the timer; see also timer() function
+    function startTimer() {
+        resetStats(); // reset stats and get a new problem
+        
+        running = true;
+        
+        count = time - 1; // set the time in seconds
+        
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
+        
+        document.getElementById('timer').style.display = 'inline'; // display the time remaining
+        document.getElementById('startBtn').style.display = 'none'; // hide the Start button
+        document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        
+        // disable options
+        document.getElementById('hideStatsBtn').disabled = true;
+        document.getElementById('resetBtn').disabled = true;
+        document.getElementById('showStatsBtn').disabled = true;
+        document.getElementById('playVideo').disabled = true;
+        document.getElementById('playVideo').checked = false;
+        
+        document.getElementById('thousandBox').disabled = true;
+        document.getElementById('hundredBox').disabled = true;
+        document.getElementById('tenBox').disabled = true;
+        // when decimals are added, remember to disable the check boxes for whole number, tenths, etc.
+    }
+    
+    // more running of the timer
+    function timer() {
+        document.getElementById("timer").innerHTML = count + " seconds<br />";
+        
+        count = count - 1;
+        if (count < 0) { // when time is up...           
+            window.alert('Time\'s up!'); // display a message
+           
+            stopTimer();
+            
+            return;
+        }
+    } // end of timer()
+    
+    // stop the timer
+    function stopTimer() {
+        clearInterval(counter); // stop the timer
+        running = false;
+        
+        document.getElementById('startBtn').style.display = 'inline'; // show the start button
+        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        
+        // enable options
+        document.getElementById('hideStatsBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('playVideo').disabled = false;
+        
+        document.getElementById('thousandBox').disabled = false;
+        document.getElementById('hundredBox').disabled = false;
+        document.getElementById('tenBox').disabled = false;
+        // when decimals are added, remember to enable the check boxes for whole number, tenths, etc.
+        
+        document.getElementById('timer').innerHTML = time + ' seconds<br />'; // display the timer
+    }
+    
     // call the necessary functions when the page is loaded or reloaded
     function loadPage() {
-        if (counter != 0) {
+        if (submissions != 0) {
             numAttempts++; //increment the number of attempted problems
+        }
+        if (running == false) {
+                document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }
         selectType();
         clearPage();
@@ -462,6 +532,14 @@ span {
     </td>
     
     <td style='padding-right:160px; margin-left:0px; border:none; text-align:right;'>
+        <!-- timer -->
+        <span>One-minute timer</span>
+        <br />
+        <div id='timer'></div>
+        <input type='button' id='startBtn' value='Start' onclick='startTimer();' />
+        <input type='button' id='stopBtn' value='Stop' style='display:none;' onclick='stopTimer();' />
+        <br /><br />
+        
         <!-- stats -->
         <div id='stats'>
             <span style='text-decoration:underline;'>Statistics</span><br />
@@ -477,11 +555,12 @@ span {
         <!-- options -->
         <span>
             Round to the nearest...<br />
-            thousand<input type='checkbox' name='type1' checked='checked' /><br />
-            hundred<input type='checkbox' name='type2' checked='checked' /><br />
-            ten<input type='checkbox' name='type3' checked='checked' /><br />
+            thousand<input type='checkbox' name='type1' id='thousandBox' checked='checked' /><br />
+            hundred<input type='checkbox' name='type2' id='hundredBox' checked='checked' /><br />
+            ten<input type='checkbox' name='type3' id='tenBox' checked='checked' /><br />
             
             <!-- decimals need to have display fixed; no commas should be displayed after the decimal
+            // when this section is reinstated, make sure to add id's and disable them when the timer is started
             Decimals - Round to the nearest...<br />
             <input type='checkbox' name='type4' />whole number<br />
             <input type='checkbox' name='type5' />tenth<br />
@@ -496,7 +575,7 @@ span {
         <br /><br />
         
         <!-- checkbox for video feedback -->
-        <input type='checkbox' name='playVideo' />Play video feedback
+        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
         <br />
         
         <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
