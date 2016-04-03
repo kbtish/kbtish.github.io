@@ -22,7 +22,7 @@ span {
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
     var submissions; // keep track of how many times an answer is submitted for a given problem
-    var time = 60; // seconds on the timer
+    var time; // seconds on the timer
     var count; // will hold the number of seconds
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
@@ -213,6 +213,15 @@ span {
     
     // run the timer; see also timer() function
     function startTimer() {
+        var i = document.forms[0].timeLimit.value;
+        
+        if (i == 'oneMin') {
+            time = 60;
+        }
+        else if (i == 'fiveMin') {
+            time = 300;
+        }
+
         resetStats(); // reset stats and get a new problem
         
         running = true;
@@ -220,10 +229,13 @@ span {
         count = time - 1; // set the time in seconds
         
         counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
+
+        document.getElementById('timerPrompt').innerHTML = 'Time:'; 
         
         document.getElementById('timer').style.display = 'inline'; // display the time remaining
         document.getElementById('startBtn').style.display = 'none'; // hide the Start button
         document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        document.getElementById('timeLimit').style.display = 'none'; // hide the selection list
         
         // disable options
         document.getElementById('hideStatsBtn').disabled = true;
@@ -257,8 +269,13 @@ span {
         clearInterval(counter); // stop the timer
         running = false;
         
+
+        document.getElementById('timerPrompt').innerHTML = 'Set the timer';
+
         document.getElementById('startBtn').style.display = 'inline'; // show the start button
         document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
+        document.getElementById('timer').style.display = 'none'; // hide the time remaining
         
         // enable options
         document.getElementById('hideStatsBtn').disabled = false;
@@ -270,8 +287,6 @@ span {
         document.getElementById('subtraction').disabled = false;
         document.getElementById('multiplication').disabled = false;
         document.getElementById('division').disabled = false;
-        
-        document.getElementById('timer').innerHTML = time + ' seconds<br />'; // display the timer
     }
     
     // call necessary functions when page loads
@@ -353,15 +368,11 @@ span {
 <body onload='loadPage();'>
 
 <div id="header">
-<h1>Mathletics Department</h1>
-<h3 style='font-style:italic;'>Get better at math</h3>
+<script src='../../external javascript files/header.js'></script>
 </div>
 
 <div id="nav">
-<a href='../main.html'>Home</a><br />
-<a href='../whole_numbers_worksheets.html'>All worksheets</a><br />
-<a href='../whole_numbers_flashcards.html'>All flash cards</a><br />
-<a href='../whole_numbers_videos.html'>All videos</a>
+<script src='../../external javascript files/nav.js'></script>
 </div>
 
 <div id="section">
@@ -424,12 +435,19 @@ span {
     
     <td style='margin-left:15px; border:none; text-align:right;'>
         <!-- timer -->
-        <span>One-minute timer</span>
-        <br />
-        <div id='timer'></div>
+        <div>
+            <span id='timerPrompt'>Set the timer</span>
+            <br />
+            <select name='timeLimit' id='timeLimit'>
+                <option value='oneMin'>1 minute</option>
+                <option value='fiveMin'>5 minutes</option>
+            </select>
+        </div>
+        <div id='timer' style='display:none;'></div>
         <input type='button' id='startBtn' value='Start' style='height:30px;' onclick='startTimer();' />
         <input type='button' id='stopBtn' value='Stop' style='height:30px; display:none;' onclick='stopTimer();' />
         <br /><br />
+
         
         <!-- stats -->
         <div id='stats'>
@@ -470,7 +488,7 @@ span {
 </div>
 
 <div id="footer">
-<a href='main.html'>Home</a>
+<script src='../../external javascript files/footer.js'></script>
 </div>
 
 </body>
