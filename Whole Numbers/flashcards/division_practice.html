@@ -150,13 +150,10 @@ span {
             if (document.forms[0].playVideo.checked == true) {
                 playWrongAnswer();
             }
-            document.getElementById('feedback').innerHTML = 'Not quite.  Try again.';
+            document.getElementById('feedback').innerHTML = 'Not quite.';
         }
         
-        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
-        document.getElementById('attempted').innerHTML = numAttempts;
-        document.getElementById('correct').innerHTML = numCorrect;
-        document.getElementById('percent').innerHTML = pctCorrect + '%';
+        calculateStats();
         
         return false;
     } // end of checkAnswer()
@@ -177,6 +174,10 @@ span {
     // show the correct answer
     function showAnswer() {
         document.getElementById('answer').innerHTML = 'Answer: ' + numberWithCommas(answer);
+        
+        // if no answer has been submitted, this will count as a wrong answer
+        submissions++;
+        calculateStats();
     }
     
     // hide or show 
@@ -220,7 +221,6 @@ span {
     function resetStats() {
         numAttempts = 0;
         numCorrect = 0;
-        submissions = 1;
         
         document.getElementById('attempted').innerHTML = '';
         document.getElementById('correct').innerHTML = '';
@@ -243,6 +243,14 @@ span {
         document.getElementById('resetBtn').style.visibility = 'visible';
         document.getElementById('hideStatsBtn').style.visibility = 'visible';
         document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
+    // calculate and update the statistics
+    function calculateStats() {
+        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';        
     }
     
     // run the timer; see also timer() function
