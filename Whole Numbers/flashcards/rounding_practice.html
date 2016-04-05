@@ -243,6 +243,8 @@ span {
         
         submissions++; // increment the number of submitted answers for the given problem
         
+        incrementAttempts();
+        
         // display user's answer
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' +
                                                             document.forms[0].userAnswer.value;
@@ -271,12 +273,20 @@ span {
         return false;
     } // end of function checkAnswer()
     
+    // if this is the first attempt at a problem, we need to increment the total of attempts
+    function incrementAttempts() {
+        if (submissions == 1) {
+            numAttempts++;
+        }
+    }
+    
     // show the answer if the user is stuck
     function showAnswer() {
         document.getElementById('answer').innerHTML = 'Answer: ' + displayAnswer;
         
         // if no answer has been submitted, this will count as a wrong answer
         submissions++;
+        incrementAttempts();
         calculateStats();
     }
     
@@ -403,9 +413,6 @@ span {
     
     // call the necessary functions when the page is loaded or reloaded
     function loadPage() {
-        if (submissions != 0) {
-            numAttempts++; //increment the number of attempted problems
-        }
         if (running == false) {
                 document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }

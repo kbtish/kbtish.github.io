@@ -156,9 +156,17 @@ span {
             document.getElementById('feedback').innerHTML = 'Not quite.';
         }
         
+        incrementAttempts();
         calculateStats();
         
         return false;
+    }
+    
+    // if this is the first attempt at a problem, we need to increment the total of attempts
+    function incrementAttempts() {
+        if (submissions == 1) {
+            numAttempts++;
+        }
     }
     
     // allow numberpad to type in answer
@@ -180,6 +188,7 @@ span {
         
         // if no answer has been submitted, this will count as a wrong answer
         submissions++;
+        incrementAttempts();
         calculateStats();
     }
     // set or reset the video frame to blank
@@ -330,9 +339,6 @@ span {
     }
     // call necessary functions when page loads
     function loadPage() {
-        if (submissions != 0) {
-            numAttempts++; //increment the number of attempted problems
-        }
         if (running == false) {
             document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }

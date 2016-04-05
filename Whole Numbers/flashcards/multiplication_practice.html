@@ -36,11 +36,27 @@ span {
             secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
         }
         else {
-            // generate the first number
+            // how many digits are selected for the first and second numbers?
             var i = parseInt(document.forms[0].firstDigits.value);
+            var j = parseInt(document.forms[0].secondDigits.value);
             
+            var nixOneZero; // Boolean variable to see if one and zero should be barred as factors
+            
+            if ((i==1 && j>2)
+                || (j==1 && i>2)) { // multiplying 1-digit by 3+ digits
+
+                    nixOneZero = true;
+            }
+            
+            // generate the first number            
             if (i == 1) {
-                minValue = 0;
+                if (nixOneZero == true) {
+                    minValue = 2;
+                }
+                else {
+                    minValue = 0;
+                }
+                
             }
             else {
                 minValue = Math.pow(10, i-1);
@@ -50,11 +66,14 @@ span {
             
             firstNum = Math.floor(Math.random()*(maxValue - minValue + 1) + minValue); // random number
             
-            // generate the second number
-            var j = parseInt(document.forms[0].secondDigits.value);
-            
+            // generate the second number            
             if (j == 1) {
-                minValue = 0;
+                if (nixOneZero == true) {
+                    minValue = 2;
+                }
+                else {
+                    minValue = 0;
+                }
             }
             else {
                 minValue = Math.pow(10, j-1);
@@ -97,7 +116,10 @@ span {
             return false;
         }
         
-        submissions++; // increment the number of submitted answers for the given problem
+        // increment the number of submitted answers for the given problem
+        submissions++;
+        
+        incrementAttempts();
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
@@ -125,6 +147,13 @@ span {
         return false;
     } // end of checkAnswer()
     
+    // if this is the first attempt at a problem, we need to increment the total of attempts
+    function incrementAttempts() {
+        if (submissions == 1) {
+            numAttempts++;
+        }
+    }
+    
     // allow numberpad to type in answer
     function updateString(value) {
         inputString += value;
@@ -144,6 +173,9 @@ span {
         
         // if no answer has been submitted, this will count as a wrong answer
         submissions++;
+        
+        incrementAttempts(); 
+        
         calculateStats();
     }
     
@@ -155,7 +187,7 @@ span {
             document.getElementById('secondDigits').style.visibility = 'hidden';
         }
         else { // 'Facts only' is not selected
-            // make the options for number of digits visibile
+            // make the options for number of digits visible
             document.getElementById('firstDigits').style.visibility = 'visible';
             document.getElementById('secondDigits').style.visibility = 'visible';
         }
@@ -279,9 +311,6 @@ span {
     
     // call necessary functions when page loads
     function loadPage() {
-        if (submissions != 0) {
-            numAttempts++; //increment the number of attempted problems
-        }
         if (running == false) {
                 document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }
