@@ -31,6 +31,7 @@ span {
     var count; // will hold the number of seconds
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
+    var device = 'desktop'; // can be changed to mobile; difference is in autofocus
     
     // get numbers for the new problem
     function generateNumbers() {        
@@ -132,8 +133,8 @@ span {
         
         // give appropriate feedback
         if (
-            (inputString == answer)
-            || (remainderZero == true && inputString == answer + 'R' + remainder)
+            (document.forms[0].userAnswer.value == answer)
+            || (remainderZero == true && document.forms[0].userAnswer.value == answer + 'R' + remainder)
             ) { // answer is correct
                 
                 if (submissions == 1) {
@@ -150,7 +151,15 @@ span {
             if (document.forms[0].playVideo.checked == true) {
                 playWrongAnswer();
             }
+            
             document.getElementById('feedback').innerHTML = 'Not quite.';
+                                   
+            if (running == true) { // timer is running
+                // show correct answer so user doesn't need to click "Show Answer" button
+                document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+            }
+
+            document.forms[0].newProblem.focus();            
         }
         
         incrementAttempts();
@@ -341,12 +350,41 @@ span {
         document.getElementById('timer').innerHTML = time + ' seconds<br />'; // display the timer
     }
     
+    // change the autofocus to support mobile and tablet devices
+    function changeToMobile() {
+        device = 'mobile';
+        loadPage();
+    }
+    
+    // change the autofocus to support desktop devices
+    function changeToDesktop() {
+        device = 'desktop';
+        loadPage();
+    }
+    
     // call necessary functions when page loads
     function loadPage() {
         if (verify() == true) { // verify that first number has at least as many digits as second number
             if (running == false) {
                 document.getElementById('timer').innerHTML = time + ' seconds<br />';
             }
+        
+            if (device == 'desktop') {
+                // autofocus on the input box
+                document.forms[0].userAnswer.focus();
+                
+                // change the display
+                document.getElementById('version').innerHTML =
+                    'You are using the desktop version.' +
+                    '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
+            }
+            else {            
+                // change the display
+                document.getElementById('version').innerHTML =
+                    'You are using the mobile/tablet version.' +
+                    '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+            }
+        
             clearAnswer();
             generateNumbers();
             generateProblem();
@@ -431,6 +469,10 @@ span {
 <div id="section">
 <h2>Division Flash Cards</h2>
 <form action=''>
+    <div id='version'>
+        <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
+    </div>
+    
     <table>
     <tr>
     <td style='border:solid; width:45%; padding:5px;'>
