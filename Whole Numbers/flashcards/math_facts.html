@@ -27,14 +27,98 @@ span {
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
+    var verified = true; // verify that at least one operation and one digit are selected
     
     // get numbers for the new problem
     function generateNumbers() {
-        firstNum = Math.floor(Math.random() * 10); // random number between 0 and 9
+        firstNum = useSelectedDigits(); // from external javascript file
         secondNum = Math.floor(Math.random() * 10); // random number between 0 and 9
         
         submissions = 0; // no answers have been submitted for the given problem
     }
+
+    // let the user practice with selected digits    
+    function useSelectedDigits() {
+        var numSelected = 0;
+        var digit = new Array();
+    
+        // populate an array with the digits that have been checked
+        if (document.forms[0].digitZero.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 0;
+        }
+        if (document.forms[0].digitOne.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 1;
+        }
+        if (document.forms[0].digitTwo.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 2;
+        }
+        if (document.forms[0].digitThree.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 3;
+        }
+        if (document.forms[0].digitFour.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 4;
+        }
+        if (document.forms[0].digitFive.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 5;
+        }
+        if (document.forms[0].digitSix.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 6;
+        }
+        if (document.forms[0].digitSeven.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 7;
+        }
+        if (document.forms[0].digitEight.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 8;
+        }
+        if (document.forms[0].digitNine.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 9;
+        }
+        
+
+        // randomly select which digit to use for one of the numbers
+        var i = Math.floor(Math.random() * numSelected);
+        
+        if (digit[i] == '0') {
+            return 0;
+        }
+        else if (digit[i] == '1') {
+            return 1;
+        }
+        else if (digit[i] == '2') {
+            return 2;
+        }
+        else if (digit[i] == '3') {
+            return 3;
+        }
+        else if (digit[i] == '4') {
+            return 4;
+        }
+        else if (digit[i] == '5') {
+            return 5;
+        }
+        else if (digit[i] == '6') {
+            return 6;
+        }
+        else if (digit [i] == '7') {
+            return 7;
+        }
+        else if (digit[i] == '8') {
+            return 8;
+        }
+        else if (digit[i] == '9') {
+            return 9;
+        }        
+    } // end of useSelectedDigits()
     
     // determine what kind of question to display
     function selectQuestionType() {
@@ -60,7 +144,7 @@ span {
             numSelected++;
             question[numSelected-1] = 'division';
         }
-        
+
         // randomly select which type of operation to do
         i = Math.floor(Math.random() * numSelected);
         if (question[i] == 'addition') {
@@ -74,9 +158,6 @@ span {
         }
         else if (question[i] == 'division') {
             divisionProblem();
-        }
-        else if (numSelected == 0) {
-            window.alert("Please select at least one operation.");
         }
         else {
             document.getElementById('repeatAnswer').innerHTML = "<br />";
@@ -96,9 +177,9 @@ span {
     // create a subtraction problem
     function subtractionProblem() {
         var thirdNum = firstNum + secondNum;
-        var problem = thirdNum + ' - ' + secondNum + ' = ?';
+        var problem = thirdNum + ' - ' + firstNum + ' = ?';
         document.getElementById('problemSpace').innerHTML = problem;
-        answer = firstNum;
+        answer = secondNum;
     }
     
     // create a multiplication problem
@@ -326,35 +407,101 @@ span {
         loadPage();
     }
     
-    // call necessary functions when page loads
-    function loadPage() {
-        if (running == false) {
-                document.getElementById('timer').innerHTML = time + ' seconds<br />';
+    function verifyDigitsAndOperations() {
+        // addition, subtraction, and multiplication are NOT selected
+        if (document.forms[0].addition.checked == false
+            && document.forms[0].subtraction.checked == false
+            && document.forms[0].multiplication.checked == false
+            && document.forms[0].division.checked == false) {
+
+                window.alert('Select at least one operation.');
+                verified = false;
+                var m = false;
+                return false;
+        }
+        else {
+                var m = true;
         }
         
-        if (device == 'desktop') {
-            // autofocus on the input box
-            document.forms[0].userAnswer.focus();
+        // digits 1-9 are NOT selected
+        if (document.forms[0].digitOne.checked == false
+            && document.forms[0].digitTwo.checked == false
+            && document.forms[0].digitThree.checked == false
+            && document.forms[0].digitFour.checked == false
+            && document.forms[0].digitFive.checked == false
+            && document.forms[0].digitSix.checked == false
+            && document.forms[0].digitSeven.checked == false
+            && document.forms[0].digitEight.checked == false
+            && document.forms[0].digitNine.checked == false) {
             
-            // change the display
-            document.getElementById('version').innerHTML =
-                'You are using the desktop version.' +
-                '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
+                var j = true;
         }
-        else {            
-            // change the display
-            document.getElementById('version').innerHTML =
-                'You are using the mobile/tablet version.' +
-                '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+        else {
+                var j = false;
         }
-
-        clearAnswer();
-        generateNumbers();
-        document.getElementById('repeatAnswer').innerHTML = '';
-        document.getElementById('feedback').innerHTML = '';
-        document.getElementById('answer').innerHTML = '';
-        selectQuestionType(); // choose from the list of selected operations
-        resetVideoFrame();
+        
+        // make sure at least one digit is selected
+        if (j == true && document.forms[0].digitZero.checked == false) {
+            window.alert('Select at least one digit.');
+            verified = false;
+            var n = false;
+            return false;
+        }
+        else {
+            var n = true;
+        }
+        
+        // make sure the user isn't trying to divide by zero
+        if (m == true
+            && j == true
+            && document.forms[0].division.checked == true
+            && document.forms[0].digitZero.checked == true) {
+            // only division and 0 are checked
+                window.alert('Only Chuck Norris can divide by zero!\n' +
+                             'Either unselect division, or ' +
+                             'choose another digit besides zero.');
+                verified = false;
+                return false;
+        }
+        
+        // at least one operation and at least one digit are selected
+        if (m == true && n == true) {
+            verified = true;
+        }        
+    } // end of verifyDigitsAndOperations
+    
+    // call necessary functions when page loads
+    function loadPage() {
+        verifyDigitsAndOperations();
+        if (verified == true) {
+            if (running == false) {
+                    document.getElementById('timer').innerHTML = time + ' seconds<br />';
+            }
+            
+            if (device == 'desktop') {
+                // autofocus on the input box
+                document.forms[0].userAnswer.focus();
+                
+                // change the display
+                document.getElementById('version').innerHTML =
+                    'You are using the desktop version.' +
+                    '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
+            }
+            else {            
+                // change the display
+                document.getElementById('version').innerHTML =
+                    'You are using the mobile/tablet version.' +
+                    '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+            }
+    
+            clearAnswer();
+            generateNumbers();
+            document.getElementById('repeatAnswer').innerHTML = '';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('answer').innerHTML = '';
+            selectQuestionType(); // choose from the list of selected operations
+            resetVideoFrame();
+        }
     }
     // video feedback for correct answers
     function playCorrectAnswer() {
@@ -416,7 +563,7 @@ span {
 </script>
 </head>
 
-<body onload='loadPage();'>
+<body onload='return loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>
@@ -435,7 +582,7 @@ span {
     
     <table>
     <tr>
-    <td style='border:solid; width:45%; padding:5px;'>
+    <td style='border:solid; width:30%; min-width:190px; padding:5px;'>
         Perform the operation:
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
@@ -474,7 +621,7 @@ span {
         <br />
         
         <!-- button to generate a new problem -->
-        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='return loadPage();' />
         <br />
         
         <!-- button to show correct answer -->
@@ -488,7 +635,7 @@ span {
         <span id='closingMessage'>&nbsp;</span>
     </td>
     
-    <td style='margin-left:15px; border:none; text-align:right;'>
+    <td style='margin-left:15px; width:30%; border:none; text-align:right; vertical-align:top;'>
         <!-- timer -->
         <div>
             <span id='timerPrompt'>Set the timer</span>
@@ -516,7 +663,17 @@ span {
         <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
         <br /><br />
         
-        <!-- options -->        
+        <!-- checkbox for video feedback -->
+        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
+        <br />
+        
+        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
+        
+    </td>
+    
+    <!-- 3rd column, options -->
+    <td style='margin-left:15px; padding-left:20px; width:30%; min-width:140px; border:none; text-align:right; vertical-align:top;'>     
+        <!-- choose operations -->
         <span>
             Operation(s) to practice<br />
             Add<input type='checkbox' name='addition' id='addition' checked='checked' /><br />
@@ -526,15 +683,29 @@ span {
         </span>
         <br />
         <!-- button to generate a new problem -->
-        <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <input type='button' value='New problem' style='height:30px;' onclick='return loadPage();' />
         <br /><br />
-        
-        <!-- checkbox for video feedback -->
-        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
+        <!-- select which of the digits to use -->
+        <span>
+            Choose your digits
+        </span>
         <br />
-        
-        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
-        
+        7<input type='checkbox' name='digitSeven' checked='checked' />&nbsp;&nbsp;&nbsp;
+        8<input type='checkbox' name='digitEight' checked='checked' />&nbsp;&nbsp;&nbsp;
+        9<input type='checkbox' name='digitNine' checked='checked' /><br />
+        4<input type='checkbox' name='digitFour' checked='checked' />&nbsp;&nbsp;&nbsp;
+        5<input type='checkbox' name='digitFive' checked='checked' />&nbsp;&nbsp;&nbsp;
+        6<input type='checkbox' name='digitSix' checked='checked' /><br />
+        1<input type='checkbox' name='digitOne' checked='checked' />&nbsp;&nbsp;&nbsp;
+        2<input type='checkbox' name='digitTwo' checked='checked' />&nbsp;&nbsp;&nbsp;
+        3<input type='checkbox' name='digitThree' checked='checked' /><br />
+        0<input type='checkbox' name='digitZero' checked='checked' /><br />
+        <script src='../../external javascript files/selectDigits.js'></script>
+        <input type='button' value='Select all' style='height:30px;' onclick='selectAllDigits();' />
+        <input type='button' value='Clear all' style='height:30px;' onclick='clearAllDigits();' />
+        <br /><br />
+        <input type='button' value='New problem' style='height:30px;' onclick='return loadPage();' />
+
     </td>
     </tr>
     </table>
