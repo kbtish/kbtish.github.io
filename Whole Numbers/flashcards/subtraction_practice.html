@@ -292,7 +292,19 @@ span {
         count = count - 1;
         if (count < 0) { // when time is up...           
             window.alert('Time\'s up!'); // display a message
-           
+            
+            var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+            var i;
+            
+            if (time == 60) {
+                i = '1 minute';
+            }
+            else {
+                i = '5 minutes';
+            }
+            window.alert('Time: ' + i +
+                         '\nNumber correct: ' + numCorrect + 
+                         '\nPercent correct: ' + pctCorrect + '%');           
             stopTimer();
             
             return;
