@@ -114,6 +114,9 @@ span {
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
+        
+        answer = numberWithCommas(answer);
+        
         // give appropriate feedback
         if (document.forms[0].userAnswer.value == answer) { // answer is correct
             if (submissions == 1) {

@@ -169,7 +169,7 @@ span {
     
     // create an addition problem
     function additionProblem() {
-        var problem = firstNum + ' + ' + secondNum + ' = ?';
+        var problem = secondNum+ ' + ' + firstNum + ' = ?';
         document.getElementById('problemSpace').innerHTML = problem;
         answer = firstNum + secondNum;
     }
@@ -184,7 +184,7 @@ span {
     
     // create a multiplication problem
     function multiplicationProblem() {
-        var problem = firstNum + ' &times; ' + secondNum + ' = ?';
+        var problem = secondNum + ' &times; ' + firstNum + ' = ?';
         document.getElementById('problemSpace').innerHTML = problem;
         answer = firstNum * secondNum;
     }
@@ -689,12 +689,16 @@ span {
         <!-- choose operations -->
         <span>
             Operation(s) to practice<br />
-            Add<input type='checkbox' name='addition' id='addition' checked='checked' /><br />
+            Add<input type='checkbox' name='addition' id='addition' checked='checked' />
+            &nbsp;&nbsp;&nbsp;
             Subtract<input type='checkbox' name='subtraction' id='subtraction' /><br />
-            Multiply<input type='checkbox' name='multiplication' id='multiplication' /><br />
+            Multiply<input type='checkbox' name='multiplication' id='multiplication' />
+            &nbsp;&nbsp;&nbsp;
             Divide<input type='checkbox' name='division' id='division' /><br />
+            <input type='button' value='Select all' style='height:30px;' onclick='selectAllOperations();' />
+            <input type='button' value='Clear all' style='height:30px;' onclick='clearAllOperations();' />
         </span>
-        <br />
+        <br /><br />
         <!-- button to generate a new problem -->
         <input type='button' value='New problem' style='height:30px;' onclick='return loadPage();' />
         <br /><br />
