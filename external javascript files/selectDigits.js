@@ -29,3 +29,16 @@ function clearAllDigits() {
     document.forms[0].digitNine.checked = false;
 }
 
+function selectAllOperations() {
+    document.forms[0].addition.checked = true;
+    document.forms[0].subtraction.checked = true;
+    document.forms[0].multiplication.checked = true;
+    document.forms[0].division.checked = true;
+}
+
+function clearAllOperations() {
+    document.forms[0].addition.checked = false;
+    document.forms[0].subtraction.checked = false;
+    document.forms[0].multiplication.checked = false;
+    document.forms[0].division.checked = false;
+}
