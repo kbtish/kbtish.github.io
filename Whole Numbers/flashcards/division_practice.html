@@ -135,7 +135,7 @@ span {
         
         // give appropriate feedback
         if (
-            (document.forms[0].userAnswer.value == answer)
+            (numberWithCommas(document.forms[0].userAnswer.value) == answer)
             || (remainderZero == true && document.forms[0].userAnswer.value == answer + 'R' + remainder)
             ) { // answer is correct
                 

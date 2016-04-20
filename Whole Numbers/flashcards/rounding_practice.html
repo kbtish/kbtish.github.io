@@ -247,10 +247,10 @@ span {
         
         // display user's answer
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' +
-                                                            document.forms[0].userAnswer.value;
+                                                            numberWithCommas(document.forms[0].userAnswer.value);
         
         // check the answer and give appropriate feedback
-        if (document.forms[0].userAnswer.value == displayAnswer) { // answer is correct
+        if (numberWithCommas(document.forms[0].userAnswer.value) == displayAnswer) { // answer is correct
             if (submissions == 1) {
                 numCorrect++;
             }

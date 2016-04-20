@@ -118,7 +118,7 @@ span {
         answer = numberWithCommas(answer);
         
         // give appropriate feedback
-        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+        if (numberWithCommas(document.forms[0].userAnswer.value) == answer) { // answer is correct
             if (submissions == 1) {
                 numCorrect++;
             }
