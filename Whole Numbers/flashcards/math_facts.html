@@ -354,7 +354,21 @@ span {
         document.getElementById('subtraction').disabled = true;
         document.getElementById('multiplication').disabled = true;
         document.getElementById('division').disabled = true;
-    }
+        document.getElementById('allOpsBtn').disabled = true;
+        document.getElementById('clearOpsBtn').disabled = true;
+        document.getElementById('allDigitsBtn').disabled = true;
+        document.getElementById('clearDigitsBtn').disabled = true;
+        document.forms[0].digitZero.disabled = true;
+        document.forms[0].digitOne.disabled = true;
+        document.forms[0].digitTwo.disabled = true;
+        document.forms[0].digitThree.disabled = true;
+        document.forms[0].digitFour.disabled = true;
+        document.forms[0].digitFive.disabled = true;
+        document.forms[0].digitSix.disabled = true;
+        document.forms[0].digitSeven.disabled = true;
+        document.forms[0].digitEight.disabled = true;
+        document.forms[0].digitNine.disabled = true;
+    } // end of startTimer()
     
     // more running of the timer
     function timer() {
@@ -406,7 +420,21 @@ span {
         document.getElementById('subtraction').disabled = false;
         document.getElementById('multiplication').disabled = false;
         document.getElementById('division').disabled = false;
-    }
+        document.getElementById('allOpsBtn').disabled = false;
+        document.getElementById('clearOpsBtn').disabled = false;
+        document.getElementById('allDigitsBtn').disabled = false;
+        document.getElementById('clearDigitsBtn').disabled = false;
+        document.forms[0].digitZero.disabled = false;
+        document.forms[0].digitOne.disabled = false;
+        document.forms[0].digitTwo.disabled = false;
+        document.forms[0].digitThree.disabled = false;
+        document.forms[0].digitFour.disabled = false;
+        document.forms[0].digitFive.disabled = false;
+        document.forms[0].digitSix.disabled = false;
+        document.forms[0].digitSeven.disabled = false;
+        document.forms[0].digitEight.disabled = false;
+        document.forms[0].digitNine.disabled = false;
+    } // end of stopTimer()
     
     // change the autofocus to support mobile and tablet devices
     function changeToMobile() {
@@ -695,8 +723,8 @@ span {
             Multiply<input type='checkbox' name='multiplication' id='multiplication' />
             &nbsp;&nbsp;&nbsp;
             Divide<input type='checkbox' name='division' id='division' /><br />
-            <input type='button' value='Select all' style='height:30px;' onclick='selectAllOperations();' />
-            <input type='button' value='Clear all' style='height:30px;' onclick='clearAllOperations();' />
+            <input type='button' value='Select all' id='allOpsBtn' style='height:30px;' onclick='selectAllOperations();' />
+            <input type='button' value='Clear all' id='clearOpsBtn' style='height:30px;' onclick='clearAllOperations();' />
         </span>
         <br /><br />
         <!-- button to generate a new problem -->
@@ -718,8 +746,8 @@ span {
         3<input type='checkbox' name='digitThree' checked='checked' /><br />
         0<input type='checkbox' name='digitZero' checked='checked' /><br />
         <script src='../../external javascript files/selectDigits.js'></script>
-        <input type='button' value='Select all' style='height:30px;' onclick='selectAllDigits();' />
-        <input type='button' value='Clear all' style='height:30px;' onclick='clearAllDigits();' />
+        <input type='button' value='Select all' id='allDigitsBtn' style='height:30px;' onclick='selectAllDigits();' />
+        <input type='button' value='Clear all' id='clearDigitsBtn' style='height:30px;' onclick='clearAllDigits();' />
         <br /><br />
         <input type='button' value='New problem' style='height:30px;' onclick='return loadPage();' />
 
