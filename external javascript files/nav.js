@@ -6,3 +6,4 @@ document.getElementById('nav').innerHTML =
     "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_worksheets.html'>All worksheets</a><br />" + 
     "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_flashcards.html'>All flash cards</a><br />" +
     "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_videos.html'>All videos</a>";
+    "<a href='http://kbtish.github.io/Whole%20Numbers/self_paced.html'>Self-paced</a>";
