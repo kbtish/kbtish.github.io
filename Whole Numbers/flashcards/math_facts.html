@@ -390,6 +390,13 @@ span {
             window.alert('Time: ' + i +
                          '\nNumber correct: ' + numCorrect + 
                          '\nPercent correct: ' + pctCorrect + '%');
+            
+            if (numCorrect >= 11 && pctCorrect >= 90) {
+                window.alert('Great job!');
+            }
+            else {
+                window.alert('Good effort!  Try again.');
+            }
            
             stopTimer();
             
