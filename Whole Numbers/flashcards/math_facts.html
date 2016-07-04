@@ -28,6 +28,10 @@ span {
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
     var verified = true; // verify that at least one operation and one digit are selected
+    var wrongAnswers = new Array(); // will hold and display incorrect answers after 1-minute timer
+    var userAnswers = new Array(); // will hold and display user's answers that were incorrect
+    var correctAnswers = new Array(); // will hold and display correct answers for missed questions on 1-min timer
+    var numWrong = 0; // holds the number of incorrect answers given during 1-minute timer
     
     // get numbers for the new problem
     function generateNumbers() {
@@ -237,6 +241,14 @@ span {
             if (running == true) { // timer is running
                 // show correct answer so user doesn't need to click "Show Answer" button
                 document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+                
+                // keep track of incorrect answers
+                if (submissions == 1) {
+                    wrongAnswers[numWrong] = document.getElementById('problemSpace').innerHTML;
+                    userAnswers[numWrong] = document.forms[0].userAnswer.value;
+                    correctAnswers[numWrong] = answer;
+                    numWrong++;
+                }
             }
             document.forms[0].newProblem.focus();
         }
@@ -391,12 +403,14 @@ span {
                          '\nNumber correct: ' + numCorrect + 
                          '\nPercent correct: ' + pctCorrect + '%');
             
-            if (numCorrect >= 11 && pctCorrect >= 90) {
-                window.alert('Great job!');
+            var displayWrong = ''; // generate a string literal to display all wrong answers
+            for (j=0; j<numWrong; j++) {
+                displayWrong = displayWrong + '\n\n' + wrongAnswers[j] +
+                    '\nYour answer: ' + userAnswers[j] +
+                    '\nCorrect answer: ' + correctAnswers[j];
             }
-            else {
-                window.alert('Good effort!  Try again.');
-            }
+            
+            window.alert('Problems to practice... ' + displayWrong);
            
             stopTimer();
             
