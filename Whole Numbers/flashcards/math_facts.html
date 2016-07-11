@@ -257,7 +257,7 @@ span {
         calculateStats();
         
         return false;
-    }
+    } // end of checkAnswer()
     
     // if this is the first attempt at a problem, we need to increment the total of attempts
     function incrementAttempts() {
@@ -287,6 +287,7 @@ span {
         incrementAttempts();
         calculateStats();
     }
+    
     // set or reset the video frame to blank
     function resetVideoFrame() {
         document.getElementById('videoSpace').innerHTML =
@@ -420,6 +421,8 @@ span {
     
     // stop the timer
     function stopTimer() {
+        numWrong = 0; // this will ultimately reset the displayWrong string
+        
         clearInterval(counter); // stop the timer
         running = false;
         

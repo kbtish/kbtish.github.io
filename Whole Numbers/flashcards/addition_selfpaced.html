@@ -1,0 +1,697 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Self-paced Addition</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
+<style type='text/css'>
+span {
+    background-color: inherit;
+    font-weight: bold;
+}
+</style>
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    // global variables
+    var inputString; // holds the value input by the user
+    var firstNum; // first addend
+    var secondNum; // second addend
+    var thirdNum; // third addend; this will be zero if only two addends are displayed
+    var minValue; // minimum value of an addend
+    var maxValue; // maximum value of an addend
+    var answer; // holds the answer
+    var numAddends; // how many addends to display for the problem (either 2 or 3)
+    var numAttempts = 0; // number of attempted problems
+    var numCorrect = 0; // number of correctly answered questions
+    var submissions; // keep track of how many times an answer is submitted for a given problem
+    var time; // seconds on the timer
+    var count; // will hold the number of seconds
+    var counter; // object/function to act as a timer
+    var running = false; // tells whether or not the timer is running
+    var device = 'desktop'; // can be changed to mobile; difference is in autofocus
+    
+    // get numbers for the new problem
+    function generateNumbers() {        
+        if (document.forms[0].factsOnly.checked == true) { // add single digit with single digit
+            firstNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+            secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+            thirdNum = 0;
+            
+        }
+        else {
+            numAddends = parseInt(document.forms[0].numAddends.value);
+        
+            // generate the first number
+            var i = parseInt(document.forms[0].firstDigits.value);
+            
+            if (i == 1) {
+                minValue = 0;
+            }
+            else {
+                minValue = Math.pow(10, i-1);
+            }
+            
+            maxValue = Math.pow(10, i) - 1;
+            
+            firstNum = Math.floor(Math.random()*(maxValue - minValue + 1) + minValue); // random number
+            
+            // generate the second number
+            var j = parseInt(document.forms[0].secondDigits.value);
+            
+            if (j == 1) {
+                minValue = 0;
+            }
+            else {
+                minValue = Math.pow(10, j-1);
+            }
+            
+            maxValue = Math.pow(10, j) - 1;
+            
+            secondNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number 
+            
+            // generate the third number, if necessary; if only two numbers are displayed, set thirdNum to zero
+            var k = parseInt(document.forms[0].thirdDigits.value);
+            
+            if (numAddends == 2) {
+                thirdNum = 0;
+            }
+            else {            
+                if (k == 1) {
+                minValue = 0;
+                }
+                else {
+                    minValue = Math.pow(10, k-1);
+                }
+                maxValue = Math.pow(10, k) - 1;
+            
+                thirdNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number
+            }   
+        }
+        
+        submissions = 0; // no answers have been submitted for the given problem       
+    } // end of generateNumbers()
+
+    // display large numbers with commas
+    function numberWithCommas(x) {
+       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    
+    // create an addition problem
+    function generateProblem() {
+        var problem;
+        
+        // display large numbers with commas
+        var firstDisplay = numberWithCommas(firstNum);
+        var secondDisplay = numberWithCommas(secondNum);
+        var thirdDisplay = numberWithCommas(thirdNum);
+        
+        if (numAddends == 2 || document.forms[0].factsOnly.checked == true) {
+            problem = firstDisplay + ' + ' + secondDisplay + ' = ?';
+        }
+        else if (numAddends == 3) {
+            problem = firstDisplay + ' + ' + secondDisplay + ' + ' + thirdDisplay + ' = ?';
+        }
+        else {
+            window.alert('Oops!  Something went wrong.  Please refresh the page.');
+        }
+        
+        document.getElementById('problemSpace').innerHTML = problem;
+        
+        answer = firstNum + secondNum + thirdNum;
+    }
+ 
+    // check the answer and give feedback
+    function checkAnswer() {
+        // make sure user inputs an answer
+        if (document.forms[0].userAnswer.value == '') { // input is blank
+            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
+            document.getElementById('feedback').innerHTML = '<br />';
+            return false;
+        }
+        
+        submissions++; // increment the number of submitted answers for the given problem
+        
+        // display user's answer               
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
+        
+        answer = numberWithCommas(answer);
+        
+        // give appropriate feedback
+        if (numberWithCommas(document.forms[0].userAnswer.value) == answer) { // answer is correct
+            // track stats
+            if (submissions == 1) {
+                numCorrect++;
+            }
+            
+            if (document.forms[0].playVideo.checked == true) {
+                playCorrectAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            document.forms[0].newProblem.focus();
+        }
+        else { // answer is incorrect
+            if (document.forms[0].playVideo.checked == true) {
+                playWrongAnswer();
+            }
+            
+            document.getElementById('feedback').innerHTML = 'Not quite.';
+            
+            if (running == true) { // timer is running
+                // show correct answer so user doesn't need to click "Show Answer" button
+                document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+            }
+
+            document.forms[0].newProblem.focus();            
+        }
+        
+        incrementAttempts();
+        calculateStats();
+        
+        return false;
+    }
+    
+    // if this is the first attempt at a problem, we need to increment the total of attempts
+    function incrementAttempts() {
+        if (submissions == 1) {
+            numAttempts++;
+        }
+    }
+    
+    // allow numberpad to type in answer
+    function updateString(value) {
+        inputString += value;
+        var displayString = numberWithCommas(inputString)
+        document.forms[0].userAnswer.value = displayString;
+    }
+    
+    // clear button to reset the form
+    function clearAnswer() {
+        document.forms[0].userAnswer.value = "";
+        inputString = "";
+    }
+    
+    // show the correct answer
+    function showAnswer() {
+        document.getElementById('answer').innerHTML = 'Answer: ' + numberWithCommas(answer);
+        
+        // if no answer has been submitted, this will count as a wrong answer
+        submissions++;
+        incrementAttempts();
+        calculateStats();
+    }
+    // set or reset the video frame to blank
+    function resetVideoFrame() {
+        document.getElementById('videoSpace').innerHTML =
+                '<video width="240" height="132"></video>';
+    }
+    
+    // reset the statistics
+    function resetStats() {
+        numAttempts = 0;
+        numCorrect = 0;
+        
+        document.getElementById('attempted').innerHTML = '';
+        document.getElementById('correct').innerHTML = '';
+        document.getElementById('percent').innerHTML = '';
+        
+        loadPage();
+    }
+    
+    // hide the statistics
+    function hideStats() {
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('resetBtn').style.visibility = 'hidden';
+        document.getElementById('hideStatsBtn').style.visibility = 'hidden';
+        document.getElementById('showStatsBtn').style.display = 'inline';
+    }
+    
+    // show the statistics
+    function showStats() {
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('resetBtn').style.visibility = 'visible';
+        document.getElementById('hideStatsBtn').style.visibility = 'visible';
+        document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
+    // calculate and update the statistics
+    function calculateStats() {
+        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';        
+    }
+    
+    // run the timer; see also timer() function
+    function startTimer() {
+        running = true;
+        
+        var i = document.forms[0].timeLimit.value;
+        
+        if (i == 'oneMin') {
+            time = 60;
+        }
+        else if (i == 'fiveMin') {
+            time = 300;
+        }
+        
+        resetStats(); // reset stats and get a new problem
+        
+        count = time - 1; // set the time in seconds
+        
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
+        
+        document.getElementById('timerPrompt').innerHTML = 'Time:'; 
+        
+        document.getElementById('timer').style.display = 'inline'; // display the time remaining
+        document.getElementById('startBtn').style.display = 'none'; // hide the Start button
+        document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        document.getElementById('timeLimit').style.display = 'none'; // hide the selection list
+        
+        // disable options
+        document.getElementById('hideStatsBtn').disabled = true;
+        document.getElementById('resetBtn').disabled = true;
+        document.getElementById('showStatsBtn').disabled = true;
+        document.getElementById('factsOnly').disabled = true;
+        document.getElementById('playVideo').disabled = true;
+        document.getElementById('playVideo').checked = false;
+        
+        document.getElementById('numAddendsSelect').disabled = true;
+        document.getElementById('firstDigitsSelect').disabled = true;
+        document.getElementById('secondDigitsSelect').disabled = true;
+        document.getElementById('thirdDigitsSelect').disabled = true;
+    }
+    
+    // more running of the timer
+    function timer() {
+        document.getElementById("timer").innerHTML = count + " seconds<br />";
+        
+        count = count - 1;
+        if (count < 0) { // when time is up...           
+            window.alert('Time\'s up!'); // display a message
+
+            // display a message with stats
+            var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+            var i;
+            
+            if (time == 60) {
+                i = '1 minute';
+            }
+            else {
+                i = '5 minutes';
+            }
+            window.alert('Time: ' + i +
+                         '\nNumber correct: ' + numCorrect + 
+                         '\nPercent correct: ' + pctCorrect + '%');           
+            stopTimer();
+            
+            return;
+        }
+    } // end of timer()
+    
+    // stop the timer
+    function stopTimer() {
+        clearInterval(counter); // stop the timer
+        running = false;
+
+        document.getElementById('timerPrompt').innerHTML = 'Set the timer';
+        
+        document.getElementById('startBtn').style.display = 'inline'; // show the start button
+        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
+        document.getElementById('timer').style.display = 'none'; // hide the time remaining
+        
+        // enable options
+        document.getElementById('hideStatsBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('factsOnly').disabled = false;
+        document.getElementById('playVideo').disabled = false;
+        
+        document.getElementById('numAddendsSelect').disabled = false;
+        document.getElementById('firstDigitsSelect').disabled = false;
+        document.getElementById('secondDigitsSelect').disabled = false;
+        document.getElementById('thirdDigitsSelect').disabled = false;
+    }
+    
+    // change the autofocus to support mobile and tablet devices
+    function changeToMobile() {
+        device = 'mobile';
+        loadPage();
+    }
+    
+    // change the autofocus to support desktop devices
+    function changeToDesktop() {
+        device = 'desktop';
+        loadPage();
+    }
+    
+    // hide or show the selection list for the third number
+    function changeVisibility() {
+        if (document.forms[0].factsOnly.checked == true) { // 'Facts only' is selected
+            // make the other options invisibile
+            document.getElementById('numAddends').style.visibility = 'hidden';
+            document.getElementById('firstDigits').style.visibility = 'hidden';
+            document.getElementById('secondDigits').style.visibility = 'hidden';
+            document.getElementById('thirdDigits').style.visibility = 'hidden';
+        }
+        else { // 'Facts only' is not selected
+            // make number of addends and digits for first two numbers visible
+            document.getElementById('numAddends').style.visibility = 'visible';
+            document.getElementById('firstDigits').style.visibility = 'visible';
+            document.getElementById('secondDigits').style.visibility = 'visible';
+        
+            // determine if the third number option should be visible or hidden
+            var i = parseInt(document.forms[0].numAddends.value);
+            if (i == 2) {
+                document.getElementById('thirdDigits').style.visibility = 'hidden';
+            }
+            else {
+                document.getElementById('thirdDigits').style.visibility = 'visible';
+            }      
+        }
+    }
+    
+    // hide the inputs for options
+    function hideOptions() {
+        document.getElementById('timerOptions').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+        document.getElementById('stats').style.display = 'none';
+        document.getElementById('hideStatsBtn').style.display = 'none';
+        document.getElementById('facts').style.display = 'none';
+        document.getElementById('numAddends').style.display = 'none';
+        document.getElementById('firstDigits').style.display = 'none';
+        document.getElementById('secondDigits').style.display = 'none';
+        document.getElementById('table').style.display = 'none';
+    }
+    
+    //user clicks on the Facts button
+    function selectFacts() {
+        // check the facts only checkbox and the one-minute timer
+        document.getElementById('factsOnly').checked = true;
+        document.forms[0].timeLimit.value = 'oneMin';
+        
+        // hide the buttons for self-paced selection
+        document.getElementById('selectOptions').style.display = 'none';
+        
+        // display necessary things
+        document.getElementById('table').style.display = 'inline';
+        document.getElementById('timer').style.display = 'inline';
+        document.getElementById('stats').style.display = 'inline';
+        document.getElementById('facts').style.display = 'inline';
+        
+        // alert user that timer will start
+        window.alert('Addition Facts' +
+                     '\nExample problem: 2 + 3 = ?' +
+                     '\nThe one-minute timer will start after you click "OK" or press Enter.');
+        
+        // generate a new problem and start the timer
+        generateNumbers();
+        generateProblem();
+        startTimer();
+        
+        // for debugging purposes... delete this when finished
+        window.alert('End of function');
+    }
+    
+    // call necessary functions when page loads
+    function loadPage() {        
+        if (running == false) {
+            document.getElementById('timer').innerHTML = time + ' seconds<br />';
+            hideOptions();
+        }
+        
+        if (device == 'desktop') {
+            // autofocus on the input box
+            document.forms[0].userAnswer.focus();
+            
+            // change the display
+            document.getElementById('version').innerHTML =
+                'You are using the desktop version.' +
+                '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
+        }
+        else {            
+            // change the display
+            document.getElementById('version').innerHTML =
+                'You are using the mobile/tablet version.' +
+                '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+        }
+
+        clearAnswer();
+        changeVisibility();
+        document.getElementById('repeatAnswer').innerHTML = '';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('answer').innerHTML = '';
+        resetVideoFrame();
+    }
+    // video feedback for correct answers
+    function playCorrectAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="reallyGoodAtMath" width="240" height="132">' +
+                        '<source src="../../files/really good at math.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(reallyGoodAtMath);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="smrt" width="240" height="132">' +
+                        '<source src="../../files/smrt.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(smrt);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // video feedback for wrong answers
+    function playWrongAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                        '<video id="what" width="240" height="132">' +
+                            '<source src="../../files/what.mp4" type="video/mp4"></source>' +
+                        '</video>';
+                playVideo(what);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="notEvenClose" width="240" height="132">' +
+                        '<source src="../../files/not even close.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(notEvenClose);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // play whichever video is called
+    function playVideo(video) {
+        video.play();
+        video.onended = function() { // when the video ends
+            resetVideoFrame();    
+        }
+    }
+    /* ]]> */
+</script>
+</head>
+
+<body onload='loadPage();'>
+
+<div id="header">
+<script src='../../external javascript files/header.js'></script>
+</div>
+
+<div id="nav">
+<script src='../../external javascript files/nav.js'></script>
+</div>
+
+<div id="section">
+<h2>Self-paced Addition</h2>
+<form action=''>
+    <div id='version'>
+        <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
+    </div>
+    <br /><br />
+    <div id='selectOptions'>
+        Select one of the options below
+        <br />
+        <input type='button' value='Addition Facts' style='width:200px;' onclick='selectFacts();'
+               title='Addition Facts
+Practice addition facts with the digits 0-9.
+Time: 1 minute
+Goal: 11 problems correct, 90% or better' />
+        <br />
+        <input type='button' value='Practice #1' style='width:200px;' onclick='selectPracticeOne();'
+               title='Practice #1
+Add a three-digit number with a two-digit number.
+Time: 5 minutes
+Goal: 4 problems correct, 80% or better' />
+        <br />
+        <input type='button' value='Practice #2' style='width:200px;' onclick='selectPracticeTwo();'
+               title='Practice #2
+Add a four-digit number with a four-digit number.
+Time: 5 minutes
+Goal: 4 problems correct, 80% or better'/>
+        <br />
+        <input type='button' value='Practice #3' style='width:200px;' onclick='selectPracticeThree();'
+               title='Practice #3
+Add three numbers at the same time.
+Time: 5 minutes
+Goal: 4 problems correct, 80% or better' />
+    </div>
+    <table id='table'>
+    <tr>
+    <td style='border:solid; width:45%; min-width:190px; padding:5px;'>
+        Perform the operation:
+        <br /><br />
+        &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
+        <br /><br />
+        
+        <!-- input box for user's answer -->
+        Answer:<input type='text' name='userAnswer' size='6' />
+        <br /><br />
+        
+        <!-- keypad -->
+        <input type='button' name='seven' style='width:60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width:60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width:60px; height:30px;' value='9' onclick='updateString("9");' />
+        <br />
+        <input type='button' name='four' style='width:60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width:60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width:60px; height:30px;' value='6' onclick='updateString("6");' />
+        <br />
+        <input type='button' name='one' style='width:60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
+        <br />
+        <input type='button' name='zero' style='width:92px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='clear' style='width:92px; height:30px;' value='Clear' onclick='clearAnswer();' />
+        <br />
+        <br />
+        <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
+        <br />
+        
+        <span id='repeatAnswer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='feedback'><br /></span>
+        &nbsp;
+        <br />
+        
+        <!-- button to generate a new problem -->
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br />
+        
+        <!-- button to show correct answer -->
+        <input type='button' value='Show answer' style='height:30px;' onclick='showAnswer();' />
+        <br />
+        
+        <span id='answer'><br /></span>
+        &nbsp;
+        <br />
+    </td>
+    
+    <td style='margin-left:15px; border:none; text-align:right;'>
+        <!-- timer -->
+        <div id='timerOptions'>
+            <span id='timerPrompt'>Set the timer</span>
+            <br />
+            <select name='timeLimit' id='timeLimit'>
+                <option value='oneMin'>1 minute</option>
+                <option value='fiveMin'>5 minutes</option>
+            </select>
+        </div>
+        <div id='timer' style='display:none;'></div>
+        <input type='button' id='stopBtn' value='Stop' style='height:30px; display:none;' onclick='stopTimer();' />
+        <br /><br />
+        
+        <!-- stats -->
+        <div id='stats'>
+            <span style='text-decoration:underline;'>Statistics</span><br />
+            Problems attempted: <span id='attempted'>&nbsp;</span><br />
+            Number correct: <span id='correct'>&nbsp;</span><br />
+            Percent correct: <span id='percent'>&nbsp;</span><br />
+        </div>
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
+        <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
+        <br /><br />
+        
+        <!-- options -->
+        <span id='facts'>
+            Facts only (0-9)
+            <input type='checkbox' name='factsOnly' id='factsOnly' onchange='changeVisibility();' />
+        </span>
+        <br /><br />
+        
+        <span id='numAddends'>
+            Number of addends
+            <select name='numAddends' id='numAddendsSelect' onchange='changeVisibility();'>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+            </select>
+        </span>
+        <br /><br />
+        
+        <span id='firstDigits'>
+            Digits for the first number
+            <select name='firstDigits' id='firstDigitsSelect'>
+                <option value='1'>1</option>
+                <option value='2' selected='selected'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+            </select>
+        </span>
+        <br />
+        
+        <span id='secondDigits'>
+            Digits for the second number
+            <select name='secondDigits' id='secondDigitsSelect'>
+                <option value='1'>1</option>
+                <option value='2' selected='selected'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+            </select>
+        </span>
+        <br />
+        
+        <span id='thirdDigits'>
+            Digits for the third number
+            <select name='thirdDigits' id='thirdDigitsSelect'>
+                <option value='1'>1</option>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+            </select>
+        </span>
+        <br />        
+    </td>
+    </tr>
+    </table>
+</form>
+
+</div>
+
+<div id="footer">
+<script src='../../external javascript files/footer.js'></script>
+</div>
+
+</body>
+</html>
