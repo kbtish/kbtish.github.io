@@ -183,7 +183,7 @@ span {
     // allow numberpad to type in answer
     function updateString(value) {
         inputString += value;
-        var displayString = numberWithCommas(inputString)
+        var displayString = numberWithCommas(inputString);
         document.forms[0].userAnswer.value = displayString;
     }
     
@@ -373,6 +373,7 @@ span {
             }      
         }
     }
+    
     // call necessary functions when page loads
     function loadPage() {
         if (running == false) {
@@ -403,7 +404,8 @@ span {
         document.getElementById('feedback').innerHTML = '';
         document.getElementById('answer').innerHTML = '';
         resetVideoFrame();
-    }
+    } // end of loadPage()
+    
     // video feedback for correct answers
     function playCorrectAnswer() {
         var numVideos = 2;

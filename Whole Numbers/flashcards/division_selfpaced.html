@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Self-paced Addition</title>
+<title>Self-paced Division</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -18,11 +18,11 @@ span {
     var inputString; // holds the value input by the user
     var firstNum; // first addend
     var secondNum; // second addend
-    var thirdNum; // third addend; this will be zero if only two addends are displayed
     var minValue; // minimum value of an addend
     var maxValue; // maximum value of an addend
     var answer; // holds the answer
-    var numAddends; // how many addends to display for the problem (either 2 or 3)
+    var remainder; // holds any remainder, if remainders are allowed
+    var remainderZero; // true if the remainder is zero; false otherwise
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
     var submissions; // keep track of how many times an answer is submitted for a given problem
@@ -39,63 +39,48 @@ span {
     
     // get numbers for the new problem
     function generateNumbers() {        
-        if (document.forms[0].factsOnly.checked == true) { // add single digit with single digit
-            firstNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
-            secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
-            thirdNum = 0;
+        if (document.forms[0].factsOnly.checked == true) { // practice division facts
+            // generate a multiplication problem, then create the division problem
+            // since problems display "firstNum / secondNum", we want firstNum to be the product
             
+            secondNum = Math.floor(Math.random()*(9) + 1); // random number between 1 and 9
+            var quotient = Math.floor(Math.random()*10); // random number between 0 and 9
+            
+            firstNum = secondNum * quotient;
         }
         else {
-            numAddends = parseInt(document.forms[0].numAddends.value);
-        
             // generate the first number
             var i = parseInt(document.forms[0].firstDigits.value);
-            
-            if (i == 1) {
-                minValue = 0;
-            }
-            else {
-                minValue = Math.pow(10, i-1);
-            }
+
+            minValue = Math.pow(10, i-1);
             
             maxValue = Math.pow(10, i) - 1;
             
             firstNum = Math.floor(Math.random()*(maxValue - minValue + 1) + minValue); // random number
             
-            // generate the second number
+            // generate the second number; eliminate division by 1 
             var j = parseInt(document.forms[0].secondDigits.value);
             
-            if (j == 1) {
-                minValue = 0;
+            if (j == 1) { // divide by a single-digit number
+                minValue = 2;
             }
             else {
                 minValue = Math.pow(10, j-1);
-            }
-            
+            }             
+                    
             maxValue = Math.pow(10, j) - 1;
             
             secondNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number 
-            
-            // generate the third number, if necessary; if only two numbers are displayed, set thirdNum to zero
-            var k = parseInt(document.forms[0].thirdDigits.value);
-            
-            if (numAddends == 2) {
-                thirdNum = 0;
+        
+            // make sure first number is greater than or equal to second number
+            if (firstNum < secondNum) {
+                var holder = firstNum;
+                firstNum = secondNum;
+                secondNum = holder;
             }
-            else {            
-                if (k == 1) {
-                minValue = 0;
-                }
-                else {
-                    minValue = Math.pow(10, k-1);
-                }
-                maxValue = Math.pow(10, k) - 1;
-            
-                thirdNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number
-            }   
         }
         
-        submissions = 0; // no answers have been submitted for the given problem        
+        submissions = 0; // no answers have been submitted for the given problem
     } // end of generateNumbers()
 
     // display large numbers with commas
@@ -110,21 +95,21 @@ span {
         // display large numbers with commas
         var firstDisplay = numberWithCommas(firstNum);
         var secondDisplay = numberWithCommas(secondNum);
-        var thirdDisplay = numberWithCommas(thirdNum);
         
-        if (numAddends == 2 || document.forms[0].factsOnly.checked == true) {
-            problem = firstDisplay + ' + ' + secondDisplay + ' = ?';
-        }
-        else if (numAddends == 3) {
-            problem = firstDisplay + ' + ' + secondDisplay + ' + ' + thirdDisplay + ' = ?';
-        }
-        else {
-            window.alert('Oops!  Something went wrong.  Please refresh the page.');
-        }
+        problem = firstDisplay + ' &divide; ' + secondDisplay + ' = ?';
         
         document.getElementById('problemSpace').innerHTML = problem;
         
-        answer = firstNum + secondNum + thirdNum;
+        remainder = firstNum % secondNum;            
+            
+        if (remainder != 0) {
+            remainderZero = false;
+            answer = ((firstNum - remainder)/secondNum) + 'R' + remainder;
+        }
+        else {
+           remainderZero = true;
+           answer = firstNum / secondNum; 
+        }    
     } // end of generateProblem()
  
     // check the answer and give feedback
@@ -144,18 +129,19 @@ span {
         answer = numberWithCommas(answer);
         
         // give appropriate feedback
-        if (numberWithCommas(document.forms[0].userAnswer.value) == answer) { // answer is correct
-            // track stats
-            if (submissions == 1) {
-                numCorrect++;
-            }
-
-            document.getElementById('feedback').innerHTML = 'Correct!';
-            document.forms[0].newProblem.focus();
+        if (
+            (numberWithCommas(document.forms[0].userAnswer.value) == answer)
+            || (remainderZero == true && document.forms[0].userAnswer.value == answer + 'R' + remainder)
+            ) { // answer is correct                
+                if (submissions == 1) {
+                    numCorrect++;
+                }
+                document.getElementById('feedback').innerHTML = 'Correct!';
+                document.forms[0].newProblem.focus();
         }
         else { // answer is incorrect            
             document.getElementById('feedback').innerHTML = 'Not quite.';
-            
+                                   
             if (running == true) { // timer is running
                 // show correct answer so user doesn't need to click "Show Answer" button
                 document.getElementById('answer').innerHTML = 'Answer: ' + answer;
@@ -166,7 +152,7 @@ span {
                     userAnswers[numWrong] = document.forms[0].userAnswer.value;
                     correctAnswers[numWrong] = answer;
                     numWrong++;
-                } 
+                }                 
             }
 
             document.forms[0].newProblem.focus();            
@@ -188,7 +174,7 @@ span {
     // allow numberpad to type in answer
     function updateString(value) {
         inputString += value;
-        var displayString = numberWithCommas(inputString);
+        var displayString = numberWithCommas(inputString)
         document.forms[0].userAnswer.value = displayString;
     }
     
@@ -326,8 +312,8 @@ span {
                 }
             }
             else if (goal == 'practiceOne') {
-                if (numCorrect >= 4 && pctCorrect >= 80) {
-                    var k = window.confirm('Great job!  You met the goal for Addition Practice #1!' +
+                if (numCorrect >= 3 && pctCorrect >= 75) {
+                    var k = window.confirm('Great job!  You met the goal for Division Practice #1!' +
                                    '\n\nDo you want to do Practice #1 again?');
                     if (k == true) {
                         selectPracticeOne();
@@ -335,7 +321,7 @@ span {
                     }
                 }
                 else { // use a confirm window to let the user try again right away
-                    var k = window.confirm('You did not meet the goal for Addition Practice #1.' +
+                    var k = window.confirm('You did not meet the goal for Division Practice #1.' +
                                  '\n\nWould you like to try again?');
                     if (k == true) { // user wants to try again
                         selectPracticeOne(); // reload page as if "Practice #1" button was pressed
@@ -344,8 +330,8 @@ span {
                 }
             }
             else if (goal == 'practiceTwo') {
-                if (numCorrect >= 4 && pctCorrect >= 80) {
-                    var k = window.confirm('Great job!  You met the goal for Addition Practice #2!' +
+                if (numCorrect >= 2 && pctCorrect >= 67) {
+                    var k = window.confirm('Great job!  You met the goal for Division Practice #2!' +
                                            '\n\nDo you want to do Practice #2 again?');
                     if (k == true) {
                         selectPracticeTwo();
@@ -353,28 +339,16 @@ span {
                     }
                 }
                 else { // use a confirm window to let the user try again right away
-                    var k = window.confirm('You did not meet the goal for Addition Practice #2.' +
+                    var k = window.confirm('You did not meet the goal for Division Practice #2.' +
                                  '\n\nWould you like to try again?');
                     if (k == true) { // user wants to try again
                         selectPracticeTwo(); // reload page as if "Practice #2" button was pressed
                         return false;
                     }
                 }
-            }
-            else if (goal == 'practiceThree') {
-                if (numCorrect >= 4 && pctCorrect >= 80) {
-                    var k = window.confirm('Great job!  You met the goal for Addition Practice #3!' +
-                                           '\n\nDo you want to do Practice #3 again?');
-                    if (k == true) {
-                        selectPracticeThree();
-                        return false;
-                    }
-                }
             } // end of feedback based on the goal
-                       
-            stopTimer(); // stop timer and reload page
             
-            return;
+            stopTimer(); 
         } // end of instructions for when time is up
     } // end of timer()
     
@@ -447,8 +421,8 @@ span {
         goal = 'facts'; // will be used to display whether or not goal is met
         
         // alert user that timer will start
-        window.alert('Addition Facts' +
-                     '\nExample problem: 2 + 3 = ?' +
+        window.alert('Division Facts' +
+                     '\nExample problem: 32 \xF7 8 = ?' +
                      '\nGoal: One minute, 11 problems correct, 90%' +
                      '\n\nThe timer will start after you click "OK" or press Enter.');        
 
@@ -468,18 +442,17 @@ span {
         goal = 'practiceOne'; // will be used to display whether or not goal is met
         
         // alert user that timer will start
-        window.alert('Addition Practice #1' +
-                     '\nExample problem: 368 + 97 = ?' +
-                     '\nGoal: Five minutes, 4 problems correct, 80%' +
+        window.alert('Division Practice #1' +
+                     '\nExample problem: 7,592 \xF7 4 = ?' +
+                     '\nGoal: Five minutes, 3 problems correct, 75%' +
                      '\n\nThe timer will start after you click "OK" or press Enter.');
         
-        // make sure "facts only" is not checked
+        // make sure "facts only" is not selected
         document.forms[0].factsOnly.checked = false;
         
         // select three-digits for first number, two-digits for second number
-        document.forms[0].numAddends.value = '2';
-        document.forms[0].firstDigits.value = '3';
-        document.forms[0].secondDigits.value = '2';
+        document.forms[0].firstDigits.value = '4';
+        document.forms[0].secondDigits.value = '1';
         // five minutes on the timer
         document.forms[0].timeLimit.value = 'fiveMin';
         document.getElementById('timer').innerHTML = '300 seconds<br />';
@@ -494,18 +467,17 @@ span {
         goal = 'practiceTwo'; // will be used to display whether or not goal is met
         
         // alert user that timer will start
-        window.alert('Addition Practice #2' +
-                     '\nExample problem: 5,626 + 9,517 = ?' +
-                     '\nGoal: Five minutes, 4 problems correct, 80%' +
+        window.alert('Division Practice #2' +
+                     '\nExample problem: 2,916 \xF7 81 = ?' +
+                     '\nGoal: Five minutes, 2 problems correct, 67%' +
                      '\n\nThe timer will start after you click "OK" or press Enter.');
 
-        // make sure "facts only" is not checked
+        // make sure "facts only" is not selected
         document.forms[0].factsOnly.checked = false;
         
         // select four-digits for first and second numbers
-        document.forms[0].numAddends.value = '2';
         document.forms[0].firstDigits.value = '4';
-        document.forms[0].secondDigits.value = '4';
+        document.forms[0].secondDigits.value = '2';
         // five minutes on the timer
         document.forms[0].timeLimit.value = 'fiveMin';
         document.getElementById('timer').innerHTML = '300 seconds<br />';
@@ -514,33 +486,6 @@ span {
         
         loadPage();
     } // end of selectPracticeTwo()
-    
-    // user selects "Practice #3"
-    function selectPracticeThree() {
-        goal = 'practiceThree'; // will be used to display whether or not goal is met
-        
-        // alert user that timer will start
-        window.alert('Addition Practice #3' +
-                     '\nExample problem: 109 + 604 + 881 = ?' +
-                     '\nGoal: Five minutes, 4 problems correct, 80%' +
-                     '\n\nThe timer will start after you click "OK" or press Enter.');
-
-        // make sure "facts only" is not checked
-        document.forms[0].factsOnly.checked = false;
-        
-        // select three addends, each with three digits
-        document.forms[0].numAddends.value = '3';
-        document.forms[0].firstDigits.value = '3';
-        document.forms[0].secondDigits.value = '3';
-        document.forms[0].thirdDigits.value = '3';
-        // five minutes on the timer
-        document.forms[0].timeLimit.value = 'fiveMin';
-        document.getElementById('timer').innerHTML = '300 seconds<br />';
-    
-        running = true
-        
-        loadPage();
-    } // end of selectPracticeThree()
     
     // when user clicks "New Problem"
     function getNewProblem() {
@@ -657,7 +602,7 @@ span {
 </div>
 
 <div id="section">
-<h2>Self-paced Addition</h2>
+<h2>Self-paced Division</h2>
 <form action=''>
     <div id='version'>
         <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
@@ -666,29 +611,23 @@ span {
     <div id='selectOptions'>
         Select one of the options below
         <br />
-        <input type='button' value='Addition Facts' style='width:200px;' onclick='selectFacts();'
-               title='Addition Facts
-Practice addition facts with the digits 0-9.
+        <input type='button' value='Division Facts' style='width:200px;' onclick='selectFacts();'
+               title='Division Facts
+Practice Division facts.  All answers are between 0 and 9.
 Time: 1 minute
 Goal: 11 problems correct, 90% or better' />
         <br />
-        <input type='button' value='Addition Practice #1' style='width:200px;' onclick='selectPracticeOne();'
-               title='Addition Practice #1
-Add a three-digit number with a two-digit number.
+        <input type='button' value='Division Practice #1' style='width:200px;' onclick='selectPracticeOne();'
+               title='Division Practice #1
+Divide a four-digit number by a one-digit number.
 Time: 5 minutes
-Goal: 4 problems correct, 80% or better' />
+Goal: 3 problems correct, 75% or better' />
         <br />
-        <input type='button' value='Addition Practice #2' style='width:200px;' onclick='selectPracticeTwo();'
-               title='Addition Practice #2
-Add a four-digit number with a four-digit number.
+        <input type='button' value='Division Practice #2' style='width:200px;' onclick='selectPracticeTwo();'
+               title='Division Practice #2
+Divide a four-digit number by a two-digit number.
 Time: 5 minutes
-Goal: 4 problems correct, 80% or better'/>
-        <br />
-        <input type='button' value='Addition Practice #3' style='width:200px;' onclick='selectPracticeThree();'
-               title='Addition Practice #3
-Add three numbers at the same time.
-Time: 5 minutes
-Goal: 4 problems correct, 80% or better' />
+Goal: 2 problems correct, 67% or better'/>
         <br /><br /><br /><br />
         Want to practice on your own?
         <ul>
@@ -698,16 +637,21 @@ Goal: 4 problems correct, 80% or better' />
                 </a>
             </li>
             <li>
-                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/addition_practice.html'>
-                    Addition practice
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/division_practice.html'>
+                    Division practice
                 </a>
             </li>
         </ul>
         Need help?
         <ul>
             <li>
-                <a href='https://www.khanacademy.org/math/arithmetic/addition-subtraction/addition-carrying/v/addition-4' target='_blank'>
-                    Watch a video on addition
+                <a href='https://www.khanacademy.org/math/arithmetic/multiplication-division/long-division/v/division-3-more-long-division-and-remainder-examples' target='_blank'>
+                    Dividing by a one-digit number (video)
+                </a>
+            </li>
+            <li>
+                <a href='https://www.youtube.com/watch?v=dc8yTVT-0PQ' target='_blank'>
+                    Dividing by a two-digit number (video)
                 </a>
             </li>
         </ul>
@@ -738,8 +682,9 @@ Goal: 4 problems correct, 80% or better' />
         <input type='button' name='two' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
         <input type='button' name='three' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
         <br />
-        <input type='button' name='zero' style='width:92px; height:30px;' value='0' onclick='updateString("0");' />
-        <input type='button' name='clear' style='width:92px; height:30px;' value='Clear' onclick='clearAnswer();' />
+        <input type='button' name='zeroBtn' style='width:60px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='remainderBtn' style='width:60px; height:30px;' value='R' onclick='updateString("R");' />
+        <input type='button' name='clearBtn' style='width:60px; height:30px;' value='Clear' onclick='clearAnswer();' />
         <br />
         <br />
         <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
@@ -799,15 +744,6 @@ Goal: 4 problems correct, 80% or better' />
         <span id='factsOption' style='display:none;'>
             Facts only (0-9)
             <input type='checkbox' name='factsOnly' id='factsOnly' />
-        </span>
-        <br /><br />
-        
-        <span id='numAddends'  style='display:none;'>
-            Number of addends
-            <select name='numAddends' id='numAddendsSelect'>
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-            </select>
         </span>
         <br /><br />
         

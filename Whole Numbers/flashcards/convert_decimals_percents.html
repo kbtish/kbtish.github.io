@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Flashcards - Multiplication Practice</title>
+<title>Flashcards - Converting Decimals and Percents</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -16,11 +16,10 @@ span {
     
     // global variables
     var inputString; // holds the value input by the user
-    var firstNum; // first addend
-    var secondNum; // second addend
-    var minValue; // minimum value of an addend
-    var maxValue; // maximum value of an addend
-    var answer; // holds the answer
+    var decimalNum; // generated number used for problem;
+    var percentNum; // equivalent in value to 'decimal' variable
+    var displayNumber; // number that is displayed for user to convert
+    var answer; // holds the answervar numAttempts = 0; // number of attempted problems
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
     var submissions; // keep track of how many times an answer is submitted for a given problem
@@ -29,83 +28,75 @@ span {
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
+    var missingPct; // if the answer is a percent, this variable will hold the answer without a % symbol
     
-    // get numbers for the new problem
+    // get numbers for the new problem, based on user's choice of options
     function generateNumbers() {        
-        if (document.forms[0].factsOnly.checked == true) { // multiply single digit by single digit
-            firstNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
-            secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+        if (document.getElementById('bigRange').checked) { // allow numbers outside range of 1-100%
+            // since most percents are between 1 and 100, I want ~75% of questions to look like
+            var i = Math.floor(Math.random()*8 + 1);
         }
-        else {
-            // how many digits are selected for the first and second numbers?
-            var i = parseInt(document.forms[0].firstDigits.value);
-            var j = parseInt(document.forms[0].secondDigits.value);
-            
-            var nixOneZero; // Boolean variable to see if one and zero should be barred as factors
-            
-            if ((i==1 && j>2)
-                || (j==1 && i>2)) { // multiplying 1-digit by 3+ digits
+        else { // default; percent between 1 and 100%
+            var i = Math.floor(Math.random()*6 + 1);
+        }
+        
+        // if 'bigRange' is not checked, 7 and 8 are not possible values for i
+        if (i == 7) { // have a number greater than 100%; decimal 1.00 to 9.99 
+            var j = Math.floor(Math.random()*899 + 100); // integer b/t 1 and 9
+            decimalNum = j / 100;
+            percentNum = j;
+        }
+        else if (i == 8) { // have the percent include a decimal; decimal 0.001 to 0.999
+            var j = Math.floor(Math.random()*999 + 1);
+            decimalNum = j / 1000;
+            percentNum = j / 10; 
+        }
+        else { // have a number between 1 and 100%; decimal 0.01 to 1; 
+            var j = Math.floor(Math.random()*100 + 1);
+            decimalNum = j / 100;
+            percentNum = j;
+        }
 
-                    nixOneZero = true;
-            }
-            
-            // generate the first number            
-            if (i == 1) {
-                if (nixOneZero == true) {
-                    minValue = 2;
-                }
-                else {
-                    minValue = 0;
-                }
-                
-            }
-            else {
-                minValue = Math.pow(10, i-1);
-            }
-            
-            maxValue = Math.pow(10, i) - 1;
-            
-            firstNum = Math.floor(Math.random()*(maxValue - minValue + 1) + minValue); // random number
-            
-            // generate the second number            
-            if (j == 1) {
-                if (nixOneZero == true) {
-                    minValue = 2;
-                }
-                else {
-                    minValue = 0;
-                }
-            }
-            else {
-                minValue = Math.pow(10, j-1);
-            }
-            
-            maxValue = Math.pow(10, j) - 1;
-            
-            secondNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number 
-        }
         
         submissions = 0; // no answers have been submitted for the given problem
+        
     } // end of generateNumbers()
-
-    // display large numbers with commas
-    function numberWithCommas(x) {
-       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
     
-    // create an addition problem
+    // create and display the problem
     function generateProblem() {
-        var problem;
+        // in case the user has selected both types of question, and we need to randomly select
+        var numSelected = 0; //
+        var question = new Array(); //
         
-        // display large numbers with commas
-        var firstDisplay = numberWithCommas(firstNum);
-        var secondDisplay = numberWithCommas(secondNum);
-
-        problem = firstDisplay + ' &times; ' + secondDisplay + ' = ?';
+        if (document.forms[0].decToPct.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'decimal';
+        }
+        if (document.forms[0].pctToDec.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'percent';
+        }
         
-        document.getElementById('problemSpace').innerHTML = problem;
-        
-        answer = firstNum * secondNum;
+        if (numSelected == 0) { // user has not selected a type of question
+            window.alert('Please select at least one type of question.');
+            return false;
+        }
+        else { // select which type to do
+            var i = Math.floor(Math.random() * numSelected);
+            if (question[i] == 'decimal') {
+                document.getElementById('prompt').innerHTML = 'Convert to a percent:';
+                document.getElementById('problemSpace').innerHTML = decimalNum;
+                
+                answer = percentNum + '%';
+                missingPct = percentNum;
+            }
+            else {
+                document.getElementById('prompt').innerHTML = 'Convert to a decimal:';
+                document.getElementById('problemSpace').innerHTML = percentNum + '%';
+            
+                answer = decimalNum;
+            }
+        }
     }
  
     // check the answer and give feedback
@@ -117,18 +108,27 @@ span {
             return false;
         }
         
-        // increment the number of submitted answers for the given problem
-        submissions++;
-        
-        incrementAttempts();
+        submissions++; // increment the number of submitted answers for the given problem
         
         // display user's answer               
-        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
         
-        answer = numberWithCommas(answer);
-        
-        // give appropriate feedback
-        if (numberWithCommas(document.forms[0].userAnswer.value) == answer) { // answer is correct
+        // give appropriate feedback        
+        if (document.forms[0].userAnswer.value == missingPct) {
+            submissions--; // don't count this against the user
+            document.getElementById('feedback').innerHTML = 'Don\'t forget the % symbol.';
+            document.forms[0].percent.focus();
+            
+            if (document.forms[0].playVideo.checked == true) {
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="partialCredit" width="240" height="132">' +
+                        '<source src="../../files/partial credit.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(partialCredit);
+            }
+        }
+        else if (document.forms[0].userAnswer.value == answer) { // answer is correct
+            // track stats
             if (submissions == 1) {
                 numCorrect++;
             }
@@ -145,19 +145,20 @@ span {
             }
             
             document.getElementById('feedback').innerHTML = 'Not quite.';
-
+            
             if (running == true) { // timer is running
                 // show correct answer so user doesn't need to click "Show Answer" button
                 document.getElementById('answer').innerHTML = 'Answer: ' + answer;
             }
-            
+
             document.forms[0].newProblem.focus();            
         }
         
+        incrementAttempts();
         calculateStats();
         
         return false;
-    } // end of checkAnswer()
+    }
     
     // if this is the first attempt at a problem, we need to increment the total of attempts
     function incrementAttempts() {
@@ -168,9 +169,7 @@ span {
     
     // allow numberpad to type in answer
     function updateString(value) {
-        inputString += value;
-        var displayString = numberWithCommas(inputString);
-        document.forms[0].userAnswer.value = displayString;
+        document.forms[0].userAnswer.value += value;
     }
     
     // clear button to reset the form
@@ -181,30 +180,13 @@ span {
     
     // show the correct answer
     function showAnswer() {
-        document.getElementById('answer').innerHTML = 'Answer: ' + numberWithCommas(answer);
+        document.getElementById('answer').innerHTML = 'Answer: ' + answer;
         
         // if no answer has been submitted, this will count as a wrong answer
         submissions++;
-        
-        incrementAttempts(); 
-        
+        incrementAttempts();
         calculateStats();
     }
-    
-    // hide or show 
-    function changeVisibility() {
-        if (document.forms[0].factsOnly.checked == true) { // 'Facts only' is selected
-            // hide the options for the number of digits
-            document.getElementById('firstDigits').style.visibility = 'hidden';
-            document.getElementById('secondDigits').style.visibility = 'hidden';
-        }
-        else { // 'Facts only' is not selected
-            // make the options for number of digits visible
-            document.getElementById('firstDigits').style.visibility = 'visible';
-            document.getElementById('secondDigits').style.visibility = 'visible';
-        }
-    }
-    
     // set or reset the video frame to blank
     function resetVideoFrame() {
         document.getElementById('videoSpace').innerHTML =
@@ -257,6 +239,7 @@ span {
         else if (i == 'fiveMin') {
             time = 300;
         }
+        
         resetStats(); // reset stats and get a new problem
         
         running = true;
@@ -266,7 +249,7 @@ span {
         counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
         
         document.getElementById('timerPrompt').innerHTML = 'Time:'; 
-                
+        
         document.getElementById('timer').style.display = 'inline'; // display the time remaining
         document.getElementById('startBtn').style.display = 'none'; // hide the Start button
         document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
@@ -280,8 +263,10 @@ span {
         document.getElementById('playVideo').disabled = true;
         document.getElementById('playVideo').checked = false;
         
+        document.getElementById('numAddendsSelect').disabled = true;
         document.getElementById('firstDigitsSelect').disabled = true;
         document.getElementById('secondDigitsSelect').disabled = true;
+        document.getElementById('thirdDigitsSelect').disabled = true;
     }
     
     // more running of the timer
@@ -291,7 +276,7 @@ span {
         count = count - 1;
         if (count < 0) { // when time is up...           
             window.alert('Time\'s up!'); // display a message
- 
+
             // display a message with stats
             var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
             var i;
@@ -304,8 +289,7 @@ span {
             }
             window.alert('Time: ' + i +
                          '\nNumber correct: ' + numCorrect + 
-                         '\nPercent correct: ' + pctCorrect + '%');
-            
+                         '\nPercent correct: ' + pctCorrect + '%');           
             stopTimer();
             
             return;
@@ -323,16 +307,18 @@ span {
         document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
         document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
         document.getElementById('timer').style.display = 'none'; // hide the time remaining
-       
+        
         // enable options
         document.getElementById('hideStatsBtn').disabled = false;
         document.getElementById('resetBtn').disabled = false;
         document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('factsOnly').disabled = false;
         document.getElementById('playVideo').disabled = false;
         
-        document.getElementById('factsOnly').disabled = false;
+        document.getElementById('numAddendsSelect').disabled = false;
         document.getElementById('firstDigitsSelect').disabled = false;
         document.getElementById('secondDigitsSelect').disabled = false;
+        document.getElementById('thirdDigitsSelect').disabled = false;
     }
     
     // change the autofocus to support mobile and tablet devices
@@ -350,7 +336,7 @@ span {
     // call necessary functions when page loads
     function loadPage() {
         if (running == false) {
-                document.getElementById('timer').innerHTML = time + ' seconds<br />';
+            document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }
         
         if (device == 'desktop') {
@@ -368,7 +354,7 @@ span {
                 'You are using the mobile/tablet version.' +
                 '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
         }
-        
+
         clearAnswer();
         generateNumbers();
         generateProblem();
@@ -376,7 +362,7 @@ span {
         document.getElementById('feedback').innerHTML = '';
         document.getElementById('answer').innerHTML = '';
         resetVideoFrame();
-    }
+    } // end of loadPage()
     
     // video feedback for correct answers
     function playCorrectAnswer() {
@@ -450,7 +436,7 @@ span {
 </div>
 
 <div id="section">
-<h2>Multiplication Flash Cards</h2>
+<h2>Converting Decimals and Percents</h2>
 <form action=''>
     <div id='version'>
         <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
@@ -459,7 +445,7 @@ span {
     <table>
     <tr>
     <td style='border:solid; width:45%; min-width:190px; padding:5px;'>
-        Perform the operation:
+        <span id='prompt'></span>
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
         <br /><br />
@@ -469,23 +455,25 @@ span {
         <br /><br />
         
         <!-- keypad -->
-        <input type='button' name='seven' style='width:60px; height:30px;' value='7' onclick='updateString("7");' />
-        <input type='button' name='eight' style='width:60px; height:30px;' value='8' onclick='updateString("8");' />
-        <input type='button' name='nine' style='width:60px; height:30px;' value='9' onclick='updateString("9");' />
+        <input type='button' name='seven' style='width: 60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width: 60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width: 60px; height:30px;' value='9' onclick='updateString("9");' />
         <br />
-        <input type='button' name='four' style='width:60px; height:30px;' value='4' onclick='updateString("4");' />
-        <input type='button' name='five' style='width:60px; height:30px;' value='5' onclick='updateString("5");' />
-        <input type='button' name='six' style='width:60px; height:30px;' value='6' onclick='updateString("6");' />
+        <input type='button' name='four' style='width: 60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width: 60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width: 60px; height:30px;' value='6' onclick='updateString("6");' />
         <br />
-        <input type='button' name='one' style='width:60px; height:30px;' value='1' onclick='updateString("1");' />
-        <input type='button' name='two' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
-        <input type='button' name='three' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
+        <input type='button' name='one' style='width: 60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width: 60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width: 60px; height:30px;' value='3' onclick='updateString("3");' />
         <br />
-        <input type='button' name='zero' style='width:92px; height:30px;' value='0' onclick='updateString("0");' />
-        <input type='button' name='clear' style='width:92px; height:30px;' value='Clear' onclick='clearAnswer();' />
+        <input type='button' name='zero' style='width: 60px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='point' style='width: 60px; height:30px;' value='.' onclick='updateString(".");' />
+        <input type='button' name='percent' style='width: 60px; height:30px;' value='%' onclick='updateString("%");' />                    
         <br />
         <br />
-        <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
+        <input type='submit' value='Check my answer' style='width:120px; height:30px;' onclick=' return checkAnswer();' />
+        <input type='button' name='clear' style='width: 60px; height:30px;' value='Clear' onclick='clearAnswer();' />
         <br />
         
         <span id='repeatAnswer'><br /></span>
@@ -538,35 +526,19 @@ span {
         <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
         <br /><br />
         
-        <!-- options -->        
-        <span>
-            Facts only (0-9)
-            <input type='checkbox' name='factsOnly' id='factsOnly' onchange='changeVisibility();' />
-        </span>
-        <br /><br />
-        
-        <span id='firstDigits'>
-            Digits for the first number
-            <select name='firstDigits' id='firstDigitsSelect'>
-                <option value='1'>1</option>
-                <option value='2' selected='selected'>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
-            </select>
-        </span>
+        <!-- options -->
+        <div>
+            <span style='text-decoration:underline;'>Type(s) of question</span><br />
+            Decimal to percent
+            <input type='checkbox' name='decToPct' id='decToPct' checked />
+            <br />
+            Percent to decimal
+            <input type='checkbox' name='pctToDec' id='pctToDec' />
+            <br /><br />
+            Percents outside of 1-100%
+            <input type='checkbox' name='bigRange' id='bigRange' />            
+        </div>
         <br />
-        
-        <span id='secondDigits'>
-            Digits for the second number
-            <select name='secondDigits' id='secondDigitsSelect'>
-                <option value='1'>1</option>
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
-            </select>
-        </span>
-        <br />
-
         <!-- button to generate a new problem -->
         <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
         <br /><br />
@@ -578,8 +550,24 @@ span {
         <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
         
     </td>
+ <!--   Buttons for self-paced exercises
+    <td style='margin-left:25px; border:none; text-align:right;'>
+        Do a self-paced exercise
+        <br />
+        <input type='button' value='Facts practice' onclick='' /><br />
+        <input type='button' value='Practice #1' onclick='' /><br />
+        <input type='button' value='Practice #2' onclicked='' /><br />
+        <input type='button' value='Practice #3' onclick='' />
+    </td>
+-->
     </tr>
     </table>
+    <div>
+        Want more practice with percentages?
+        <a href='http://kbtish.github.io/percentages.html' target='_blank'>
+            Click here
+        </a>
+    </div>
 </form>
 
 </div>

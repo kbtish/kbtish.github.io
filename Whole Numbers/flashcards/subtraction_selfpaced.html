@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Flashcards - Multiplication Practice</title>
+<title>Self-paced Subtraction</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -29,35 +29,29 @@ span {
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
+    var wrongAnswers = new Array(); // will hold and display incorrect answers after 1-minute timer
+    var userAnswers = new Array(); // will hold and display user's answers that were incorrect
+    var correctAnswers = new Array(); // will hold and display correct answers for missed questions on 1-min timer
+    var numWrong = 0; // holds the number of incorrect answers given during 1-minute timer
+    var goal; // holds a string to determine goal for correct problems and percentage
     
     // get numbers for the new problem
     function generateNumbers() {        
-        if (document.forms[0].factsOnly.checked == true) { // multiply single digit by single digit
-            firstNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+        if (document.forms[0].factsOnly.checked == true) { // add single digit with single digit
+            // generate an addition problem, then create the subtraction problem
+            // since problems display "firstNum - secondNum", we want firstNum to be the sum
+            
             secondNum = Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+            var addend= Math.floor(Math.random()*(9 - 0 + 1) + 0); // random number between 0 and 9
+            
+            firstNum = secondNum + addend;     
         }
-        else {
-            // how many digits are selected for the first and second numbers?
+        else {        
+            // generate the first number
             var i = parseInt(document.forms[0].firstDigits.value);
-            var j = parseInt(document.forms[0].secondDigits.value);
             
-            var nixOneZero; // Boolean variable to see if one and zero should be barred as factors
-            
-            if ((i==1 && j>2)
-                || (j==1 && i>2)) { // multiplying 1-digit by 3+ digits
-
-                    nixOneZero = true;
-            }
-            
-            // generate the first number            
             if (i == 1) {
-                if (nixOneZero == true) {
-                    minValue = 2;
-                }
-                else {
-                    minValue = 0;
-                }
-                
+                minValue = 0;
             }
             else {
                 minValue = Math.pow(10, i-1);
@@ -67,14 +61,11 @@ span {
             
             firstNum = Math.floor(Math.random()*(maxValue - minValue + 1) + minValue); // random number
             
-            // generate the second number            
+            // generate the second number
+            var j = parseInt(document.forms[0].secondDigits.value);
+            
             if (j == 1) {
-                if (nixOneZero == true) {
-                    minValue = 2;
-                }
-                else {
-                    minValue = 0;
-                }
+                minValue = 0;
             }
             else {
                 minValue = Math.pow(10, j-1);
@@ -82,10 +73,17 @@ span {
             
             maxValue = Math.pow(10, j) - 1;
             
-            secondNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number 
+            secondNum = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue); // random number
+            
+            // make sure first number is greater than or equal to second number
+            if (firstNum < secondNum) {
+                var holder = firstNum;
+                firstNum = secondNum;
+                secondNum = holder;
+            }
         }
         
-        submissions = 0; // no answers have been submitted for the given problem
+        submissions = 0; // no answers have been submitted for the given problem        
     } // end of generateNumbers()
 
     // display large numbers with commas
@@ -100,13 +98,13 @@ span {
         // display large numbers with commas
         var firstDisplay = numberWithCommas(firstNum);
         var secondDisplay = numberWithCommas(secondNum);
-
-        problem = firstDisplay + ' &times; ' + secondDisplay + ' = ?';
+        
+        problem = firstDisplay + ' - ' + secondDisplay + ' = ?';
         
         document.getElementById('problemSpace').innerHTML = problem;
         
-        answer = firstNum * secondNum;
-    }
+        answer = firstNum - secondNum;
+    } // end of generateProblem()
  
     // check the answer and give feedback
     function checkAnswer() {
@@ -117,10 +115,7 @@ span {
             return false;
         }
         
-        // increment the number of submitted answers for the given problem
-        submissions++;
-        
-        incrementAttempts();
+        submissions++; // increment the number of submitted answers for the given problem
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + numberWithCommas(document.forms[0].userAnswer.value);
@@ -129,31 +124,34 @@ span {
         
         // give appropriate feedback
         if (numberWithCommas(document.forms[0].userAnswer.value) == answer) { // answer is correct
+            // track stats
             if (submissions == 1) {
                 numCorrect++;
             }
-            
-            if (document.forms[0].playVideo.checked == true) {
-                playCorrectAnswer();
-            }
+
             document.getElementById('feedback').innerHTML = 'Correct!';
             document.forms[0].newProblem.focus();
         }
-        else { // answer is incorrect
-            if (document.forms[0].playVideo.checked == true) {
-                playWrongAnswer();
-            }
-            
+        else { // answer is incorrect            
             document.getElementById('feedback').innerHTML = 'Not quite.';
-
+            
             if (running == true) { // timer is running
                 // show correct answer so user doesn't need to click "Show Answer" button
                 document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+                
+                // keep track of incorrect answers
+                if (submissions == 1) {
+                    wrongAnswers[numWrong] = document.getElementById('problemSpace').innerHTML;
+                    userAnswers[numWrong] = document.forms[0].userAnswer.value;
+                    correctAnswers[numWrong] = answer;
+                    numWrong++;
+                } 
             }
-            
+
             document.forms[0].newProblem.focus();            
         }
         
+        incrementAttempts();
         calculateStats();
         
         return false;
@@ -169,7 +167,7 @@ span {
     // allow numberpad to type in answer
     function updateString(value) {
         inputString += value;
-        var displayString = numberWithCommas(inputString);
+        var displayString = numberWithCommas(inputString)
         document.forms[0].userAnswer.value = displayString;
     }
     
@@ -185,26 +183,9 @@ span {
         
         // if no answer has been submitted, this will count as a wrong answer
         submissions++;
-        
-        incrementAttempts(); 
-        
+        incrementAttempts();
         calculateStats();
     }
-    
-    // hide or show 
-    function changeVisibility() {
-        if (document.forms[0].factsOnly.checked == true) { // 'Facts only' is selected
-            // hide the options for the number of digits
-            document.getElementById('firstDigits').style.visibility = 'hidden';
-            document.getElementById('secondDigits').style.visibility = 'hidden';
-        }
-        else { // 'Facts only' is not selected
-            // make the options for number of digits visible
-            document.getElementById('firstDigits').style.visibility = 'visible';
-            document.getElementById('secondDigits').style.visibility = 'visible';
-        }
-    }
-    
     // set or reset the video frame to blank
     function resetVideoFrame() {
         document.getElementById('videoSpace').innerHTML =
@@ -219,8 +200,6 @@ span {
         document.getElementById('attempted').innerHTML = '';
         document.getElementById('correct').innerHTML = '';
         document.getElementById('percent').innerHTML = '';
-        
-        loadPage();
     }
     
     // hide the statistics
@@ -257,6 +236,7 @@ span {
         else if (i == 'fiveMin') {
             time = 300;
         }
+        
         resetStats(); // reset stats and get a new problem
         
         running = true;
@@ -266,22 +246,9 @@ span {
         counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
         
         document.getElementById('timerPrompt').innerHTML = 'Time:'; 
-                
+        
         document.getElementById('timer').style.display = 'inline'; // display the time remaining
-        document.getElementById('startBtn').style.display = 'none'; // hide the Start button
         document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
-        document.getElementById('timeLimit').style.display = 'none'; // hide the selection list
-        
-        // disable options
-        document.getElementById('hideStatsBtn').disabled = true;
-        document.getElementById('resetBtn').disabled = true;
-        document.getElementById('showStatsBtn').disabled = true;
-        document.getElementById('factsOnly').disabled = true;
-        document.getElementById('playVideo').disabled = true;
-        document.getElementById('playVideo').checked = false;
-        
-        document.getElementById('firstDigitsSelect').disabled = true;
-        document.getElementById('secondDigitsSelect').disabled = true;
     }
     
     // more running of the timer
@@ -291,7 +258,7 @@ span {
         count = count - 1;
         if (count < 0) { // when time is up...           
             window.alert('Time\'s up!'); // display a message
- 
+
             // display a message with stats
             var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
             var i;
@@ -306,52 +273,194 @@ span {
                          '\nNumber correct: ' + numCorrect + 
                          '\nPercent correct: ' + pctCorrect + '%');
             
+            var displayWrong = ''; // generate a string literal to display all wrong answers
+            for (j=0; j<numWrong; j++) {
+                displayWrong = displayWrong + '\n\n' + wrongAnswers[j] +
+                    '\nYour answer: ' + userAnswers[j] +
+                    '\nCorrect answer: ' + correctAnswers[j];
+            }
+            
+            window.alert('Problems to practice... ' + displayWrong);
+            
+            // give feedback based on the goal
+            if (goal == 'facts') {
+                if (numCorrect >= 11 && pctCorrect >= 90) {
+                    window.alert('Great job!  You met the goal for Subtraction Facts!' +
+                                 '\n\nRemember that you need to meet this goal a total of 3 times.');
+                }
+                else {
+                    window.alert('You did not meet the goal for Subtraction Facts.' +
+                                 '\n\nPlease try again.');
+                }
+            }
+            else if (goal == 'practiceOne') {
+                if (numCorrect >= 10 && pctCorrect >= 80) {
+                    window.alert('Great job!  You met the goal for Subtraction Practice #1!');
+                }
+                else {
+                    window.alert('You did not meet the goal for Subtraction Practice #1.' +
+                                 '\n\nPlease try again.');
+                }
+            }
+            else if (goal == 'practiceTwo') {
+                if (numCorrect >= 4 && pctCorrect >= 80) {
+                    window.alert('Great job!  You met the goal for Subtraction Practice #2!');
+                }
+                else {
+                    window.alert('You did not meet the goal for Subtraction Practice #2.' +
+                                 '\n\nPlease try again.');
+                }
+            } // end of feedback based on the goal
+                       
             stopTimer();
             
             return;
-        }
+        } // end of instructions for when time is up
     } // end of timer()
     
     // stop the timer
     function stopTimer() {
+        // reset wrong answers
+        numWrong = 0;
+        
         clearInterval(counter); // stop the timer
+        
+        // hide the time display and stop button
+        document.getElementById('timer').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'none';
+        
         running = false;
+        
+        showSelfPaced();
 
-        document.getElementById('timerPrompt').innerHTML = 'Set the timer';
-        
-        document.getElementById('startBtn').style.display = 'inline'; // show the start button
-        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
-        document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
-        document.getElementById('timer').style.display = 'none'; // hide the time remaining
-       
-        // enable options
-        document.getElementById('hideStatsBtn').disabled = false;
-        document.getElementById('resetBtn').disabled = false;
-        document.getElementById('showStatsBtn').disabled = false;
-        document.getElementById('playVideo').disabled = false;
-        
-        document.getElementById('factsOnly').disabled = false;
-        document.getElementById('firstDigitsSelect').disabled = false;
-        document.getElementById('secondDigitsSelect').disabled = false;
+        loadPage();
     }
     
     // change the autofocus to support mobile and tablet devices
     function changeToMobile() {
         device = 'mobile';
-        loadPage();
+        
+        document.getElementById('version').innerHTML = 'You are using the mobile/tablet version.' +
+            '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+        
     }
     
     // change the autofocus to support desktop devices
     function changeToDesktop() {
         device = 'desktop';
-        loadPage();
+        
+        document.getElementById('version').innerHTML = 'You are using the desktop version.' +
+            '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
     }
     
-    // call necessary functions when page loads
-    function loadPage() {
-        if (running == false) {
-                document.getElementById('timer').innerHTML = time + ' seconds<br />';
-        }
+    
+    // hide options when the page loads or the timer is not running
+    function hideOptions() {
+        document.getElementById('workSpace').style.visibility = 'hidden';
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('timer').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'none';
+    }
+    
+    // hide self-paced buttons when an option is selected
+    function hideSelfPaced() {
+        document.getElementById('selectOptions').style.display = 'none';
+        document.getElementById('version').style.visibility = 'hidden';
+    }
+    
+    // show relevant information when an exercise is selected
+    function showOptions() {
+        document.getElementById('workSpace').style.visibility = 'visible';
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('timer').style.display = 'inline';
+        document.getElementById('stopBtn').style.display = 'inline';
+    }
+    
+    // show the self-paced buttons when the timer stops
+    function showSelfPaced() {
+        document.getElementById('selectOptions').style.display = 'inline';
+        document.getElementById('version').style.visibility = 'visible';
+    }
+    
+    // user selects "Facts"
+    function selectFacts() {
+        goal = 'facts'; // will be used to display whether or not goal is met
+        
+        // alert user that timer will start
+        window.alert('Subtraction Facts' +
+                     '\nExample problem: 12 - 3 = ?' +
+                     '\nGoal: One minute, 11 problems correct, 90%' +
+                     '\n\nThe timer will start after you click "OK" or press Enter.');        
+
+        // select facts only
+        document.forms[0].factsOnly.checked = true;
+        // one minute on the timer
+        document.forms[0].timeLimit.value = 'oneMin';
+        document.getElementById("timer").innerHTML = "60 seconds<br />";
+        
+        running = true;
+        
+        loadPage();
+    } // end of selectFacts()
+    
+    // user selects "Practice #1"
+    function selectPracticeOne() {
+        goal = 'practiceOne'; // will be used to display whether or not goal is met
+        
+        // alert user that timer will start
+        window.alert('Subtraction Practice #1' +
+                     '\nExample problem: 68 - 29 = ?' +
+                     '\nGoal: Five minutes, 10 problems correct, 80%' +
+                     '\n\nThe timer will start after you click "OK" or press Enter.');
+        
+        // make sure "facts only" is not selected
+        document.forms[0].factsOnly.checked = false;
+        
+        // select three-digits for first number, two-digits for second number
+        document.forms[0].firstDigits.value = '2';
+        document.forms[0].secondDigits.value = '2';
+        // five minutes on the timer
+        document.forms[0].timeLimit.value = 'fiveMin';
+        document.getElementById('timer').innerHTML = '300 seconds<br />';
+        
+        running = true;
+        
+        loadPage();
+    } // end of selectPracticeOne();
+    
+    // user selects "Practice #2"
+    function selectPracticeTwo() {
+        goal = 'practiceTwo'; // will be used to display whether or not goal is met
+        
+        // alert user that timer will start
+        window.alert('Subtraction Practice #2' +
+                     '\nExample problem: 9,626 - 517 = ?' +
+                     '\nGoal: Five minutes, 4 problems correct, 80%' +
+                     '\n\nThe timer will start after you click "OK" or press Enter.');
+
+        // make sure "facts only" is not selected
+        document.forms[0].factsOnly.checked = false;
+        
+        // select four-digits for first and second numbers
+        document.forms[0].firstDigits.value = '4';
+        document.forms[0].secondDigits.value = '3';
+        // five minutes on the timer
+        document.forms[0].timeLimit.value = 'fiveMin';
+        document.getElementById('timer').innerHTML = '300 seconds<br />';
+        
+        running = true;
+        
+        loadPage();
+    } // end of selectPracticeTwo()
+    
+    // when user clicks "New Problem"
+    function getNewProblem() {
+        clearAnswer();
+        generateNumbers();
+        generateProblem();
+        document.getElementById('repeatAnswer').innerHTML = '';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('answer').innerHTML = '';
         
         if (device == 'desktop') {
             // autofocus on the input box
@@ -368,15 +477,24 @@ span {
                 'You are using the mobile/tablet version.' +
                 '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
         }
-        
-        clearAnswer();
-        generateNumbers();
-        generateProblem();
-        document.getElementById('repeatAnswer').innerHTML = '';
-        document.getElementById('feedback').innerHTML = '';
-        document.getElementById('answer').innerHTML = '';
-        resetVideoFrame();
     }
+    
+    // call necessary functions when page loads
+    function loadPage() {
+        if (running == false) {
+            document.getElementById('timer').innerHTML = time + ' seconds<br />';
+            
+            // hide table, stats, etc.
+            hideOptions();
+        }
+        else {
+            hideSelfPaced();
+            showOptions();
+            startTimer();
+        }
+
+        getNewProblem();
+    } // end of loadPage()
     
     // video feedback for correct answers
     function playCorrectAnswer() {
@@ -450,15 +568,64 @@ span {
 </div>
 
 <div id="section">
-<h2>Multiplication Flash Cards</h2>
+<h2>Self-paced Subtraction</h2>
 <form action=''>
     <div id='version'>
         <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
     </div>
+    <br /><br />
+    <div id='selectOptions'>
+        Select one of the options below
+        <br />
+        <input type='button' value='Subtraction Facts' style='width:200px;' onclick='selectFacts();'
+               title='Subtraction Facts
+Practice subtraction facts.  All answers are between 0 and 9.
+Time: 1 minute
+Goal: 11 problems correct, 90% or better' />
+        <br />
+        <input type='button' value='Subtraction Practice #1' style='width:200px;' onclick='selectPracticeOne();'
+               title='Subtraction Practice #1
+Subtract a two-digit number from a two-digit number.
+Time: 5 minutes
+Goal: 10 problems correct, 80% or better' />
+        <br />
+        <input type='button' value='Subtraction Practice #2' style='width:200px;' onclick='selectPracticeTwo();'
+               title='Subtraction Practice #2
+Subtract a three-digit number from a four-digit number.
+Time: 5 minutes
+Goal: 4 problems correct, 80% or better'/>
+        <br /><br /><br /><br />
+        Want to practice on your own?
+        <ul>
+            <li>
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/math_facts.html'>
+                    Math facts
+                </a>
+            </li>
+            <li>
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/subtraction_practice.html'>
+                    Subtraction practice
+                </a>
+            </li>
+        </ul>
+        Need help?
+        <ul>
+            <li>
+                <a href='https://www.khanacademy.org/math/arithmetic/addition-subtraction/sub-borrowing/v/basic-regrouping-or-borrowing-when-subtracting-three-digit-numbers' target='_blank'>
+                    Watch a video on subtraction
+                </a>
+            </li>
+            <li>
+                <a href='https://www.youtube.com/watch?v=NCWfLrLirKQ' target='_blank'>
+                    Video on subtracting across zeros
+                </a>
+            </li>
+        </ul>
+    </div>
     
-    <table>
+    <table id='table'>
     <tr>
-    <td style='border:solid; width:45%; min-width:190px; padding:5px;'>
+    <td style='border:solid; width:45%; min-width:190px; padding:5px;' id='workSpace'>
         Perform the operation:
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
@@ -497,7 +664,7 @@ span {
         <br />
         
         <!-- button to generate a new problem -->
-        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='getNewProblem();' />
         <br />
         
         <!-- button to show correct answer -->
@@ -514,16 +681,16 @@ span {
     <td style='margin-left:15px; border:none; text-align:right;'>
         <!-- timer -->
         <div>
-            <span id='timerPrompt'>Set the timer</span>
+            <span id='timerPrompt' style='display:none;'>Set the timer</span>
             <br />
-            <select name='timeLimit' id='timeLimit'>
+            <select name='timeLimit' id='timeLimit'  style='display:none;'>
                 <option value='oneMin'>1 minute</option>
                 <option value='fiveMin'>5 minutes</option>
             </select>
         </div>
-        <div id='timer' style='display:none;'></div>
-        <input type='button' id='startBtn' value='Start' style='height:30px;' onclick='startTimer();' />
-        <input type='button' id='stopBtn' value='Stop' style='height:30px; display:none;' onclick='stopTimer();' />
+        <div id='timer'></div>
+        <input type='button' id='startBtn' value='Start' style='height:30px; display:none;' onclick='startTimer();' />
+        <input type='button' id='stopBtn' value='Stop' style='height:30px;' onclick='stopTimer();' />
         <br /><br />
         
         <!-- stats -->
@@ -533,51 +700,76 @@ span {
             Number correct: <span id='correct'>&nbsp;</span><br />
             Percent correct: <span id='percent'>&nbsp;</span><br />
         </div>
-        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
-        <input type='button' id='resetBtn' value='Reset' style='height:30px;' onclick='resetStats()' />
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px; display:none;' onclick='hideStats();' />
+        <input type='button' id='resetBtn' value='Reset' style='height:30px; display:none;' onclick='resetStats()' />
         <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
         <br /><br />
         
-        <!-- options -->        
-        <span>
+        <!-- options -->
+        <span id='factsOption' style='display:none;'>
             Facts only (0-9)
-            <input type='checkbox' name='factsOnly' id='factsOnly' onchange='changeVisibility();' />
+            <input type='checkbox' name='factsOnly' id='factsOnly' />
         </span>
         <br /><br />
         
-        <span id='firstDigits'>
+        <span id='firstDigits' style='display:none;'>
             Digits for the first number
             <select name='firstDigits' id='firstDigitsSelect'>
                 <option value='1'>1</option>
                 <option value='2' selected='selected'>2</option>
                 <option value='3'>3</option>
                 <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
             </select>
         </span>
         <br />
         
-        <span id='secondDigits'>
+        <span id='secondDigits' style='display:none;'>
             Digits for the second number
             <select name='secondDigits' id='secondDigitsSelect'>
+                <option value='1'>1</option>
+                <option value='2' selected='selected'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
+            </select>
+        </span>
+        <br />
+        
+        <span id='thirdDigits' style='display:none;'>
+            Digits for the third number
+            <select name='thirdDigits' id='thirdDigitsSelect'>
                 <option value='1'>1</option>
                 <option value='2'>2</option>
                 <option value='3'>3</option>
                 <option value='4'>4</option>
+                <option value='5'>5</option>
+                <option value='6'>6</option>
+                <option value='7'>7</option>
             </select>
         </span>
         <br />
-
         <!-- button to generate a new problem -->
-        <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <input id='extraBtn' type='button' value='New problem' style='height:30px; display:none;' onclick='loadPage();' />
         <br /><br />
         
-        <!-- checkbox for video feedback -->
-        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
-        <br />
-        
-        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
+        <span id='videoSpace' style='width:240px; height:132px; display:none;'>&nbsp;</span>
         
     </td>
+ <!--   Buttons for self-paced exercises
+    <td style='margin-left:25px; border:none; text-align:right;'>
+        Do a self-paced exercise
+        <br />
+        <input type='button' value='Facts practice' onclick='' /><br />
+        <input type='button' value='Practice #1' onclick='' /><br />
+        <input type='button' value='Practice #2' onclicked='' /><br />
+        <input type='button' value='Practice #3' onclick='' />
+    </td>
+-->
     </tr>
     </table>
 </form>
