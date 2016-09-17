@@ -3,7 +3,6 @@
 
 document.getElementById('nav').innerHTML =
     "<a href='http://kbtish.github.io/Whole%20Numbers/main.html'>Home</a><br />" + 
-    "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_worksheets.html'>All worksheets</a><br />" + 
-    "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_flashcards.html'>All flash cards</a><br />" +
-    "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_videos.html'>All videos</a>";
-    "<a href='http://kbtish.github.io/Whole%20Numbers/self_paced.html'>Self-paced</a>";
+    "<a href='http://kbtish.github.io/Whole%20Numbers/whole_numbers_main.html'>Whole Numbers</a><br />" + 
+    "<a href='http://kbtish.github.io/Whole%20Numbers/fractions_decimals_main.html'>Fractions/Decimals</a><br />" +
+    "<a href='http://kbtish.github.io/Whole%20Numbers/prealgebra_main.html'>Pre-Algebra</a><br />";
