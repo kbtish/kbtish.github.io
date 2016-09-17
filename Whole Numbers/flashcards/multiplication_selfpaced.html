@@ -271,42 +271,72 @@ span {
             
             window.alert('Problems to practice... ' + displayWrong);
             
+            clearInterval(counter); // stop the timer
+            
             // give feedback based on the goal
             if (goal == 'facts') {
                 if (numCorrect >= 11 && pctCorrect >= 90) {
-                    window.alert('Great job!  You met the goal for Multiplication Facts!' +
-                                 '\n\nRemember that you need to meet this goal a total of 3 times.');
+                    var k = window.confirm('Great job!  You met the goal for Multiplication Facts!' +
+                                 '\n\nRemember that you need to meet this goal a total of 3 times.' +
+                                 '\n\nDo you want to do Multiplication Facts again?');
+                    if (k == true) { // user wants to try again
+                        selectFacts(); // reload page as if "facts" button was pressed
+                        return false;
+                    }
                 }
-                else {
-                    window.alert('You did not meet the goal for Multiplication Facts.' +
-                                 '\n\nPlease try again.');
+                else { // use a confirm window to let the user try again right away
+                    var k = window.confirm('You did not meet the goal for Multiplication Facts.' +
+                                 '\n\nWould you like to try again?');
+                    if (k == true) { // user wants to try again
+                        selectFacts(); // reload page as if "facts" button was pressed
+                        return false;
+                    }
                 }
             }
             else if (goal == 'practiceOne') {
                 if (numCorrect >= 4 && pctCorrect >= 80) {
-                    window.alert('Great job!  You met the goal for Multiplication Practice #1!');
+                    var k = window.confirm('Great job!  You met the goal for Multiplication Practice #1!' +
+                                   '\n\nDo you want to do Practice #1 again?');
+                    if (k == true) {
+                        selectPracticeOne();
+                        return false;
+                    }
                 }
-                else {
-                    window.alert('You did not meet the goal for Multiplication Practice #1.' +
-                                 '\n\nPlease try again.');
+                else { // use a confirm window to let the user try again right away
+                    var k = window.confirm('You did not meet the goal for Multiplication Practice #1.' +
+                                 '\n\nWould you like to try again?');
+                    if (k == true) { // user wants to try again
+                        selectPracticeOne(); // reload page as if "Practice #1" button was pressed
+                        return false;
+                    }
                 }
             }
             else if (goal == 'practiceTwo') {
                 if (numCorrect >= 4 && pctCorrect >= 80) {
-                    window.alert('Great job!  You met the goal for Multiplication Practice #2!');
+                    var k = window.confirm('Great job!  You met the goal for Multiplication Practice #2!' +
+                                           '\n\nDo you want to do Practice #2 again?');
+                    if (k == true) {
+                        selectPracticeTwo();
+                        return false;
+                    }
                 }
-                else {
-                    window.alert('You did not meet the goal for Multiplication Practice #2.' +
-                                 '\n\nPlease try again.');
+                else { // use a confirm window to let the user try again right away
+                    var k = window.confirm('You did not meet the goal for Multiplication Practice #2.' +
+                                 '\n\nWould you like to try again?');
+                    if (k == true) { // user wants to try again
+                        selectPracticeTwo(); // reload page as if "Practice #2" button was pressed
+                        return false;
+                    }
                 }
             }
             else if (goal == 'practiceThree') {
                 if (numCorrect >= 4 && pctCorrect >= 80) {
-                    window.alert('Great job!  You met the goal for Multiplication Practice #3!');
-                }
-                else {
-                    window.alert('You did not meet the goal for Multiplication Practice #3.' +
-                                 '\n\nPlease try again.');
+                    var k = window.confirm('Great job!  You met the goal for Multiplication Practice #3!' +
+                                           '\n\nDo you want to do Practice #3 again?');
+                    if (k == true) {
+                        selectPracticeThree();
+                        return false;
+                    }
                 }
             } // end of feedback based on the goal
                        
@@ -637,6 +667,7 @@ Goal: 4 problems correct, 80% or better' />
                 </a>
             </li>
         </ul>
+        <br />
         Need help?
         <ul>
             <li>
@@ -647,6 +678,30 @@ Goal: 4 problems correct, 80% or better' />
             <li>
                 <a href='https://www.khanacademy.org/math/arithmetic/multiplication-division/multi-digit-multiplication/v/multiplication-6-multiple-digit-numbers' target='_blank'>
                     How to multiply with a two-digit number (video)
+                </a>
+            </li>
+        </ul>
+        <br />
+        More Self-Paced Exercises
+        <ul>
+            <li>
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/addition_selfpaced.html'>
+                    Addition
+                </a>
+            </li>
+            <li>
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/subtraction_selfpaced.html'>
+                    Subtraction
+                </a>
+            </li>
+            <li>
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/multiplication_selfpaced.html'>
+                    Multiplication
+                </a>
+            </li>
+            <li>
+                <a href='http://kbtish.github.io/Whole%20Numbers/flashcards/division_selfpaced.html'>
+                    Division
                 </a>
             </li>
         </ul>
