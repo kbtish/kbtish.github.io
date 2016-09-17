@@ -29,24 +29,35 @@ span {
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
     var missingPct; // if the answer is a percent, this variable will hold the answer without a % symbol
+    var smallPct; // boolean; signals if the problems answer is less than 1%
+    var missingZero; // if the answer is, e.g., 0.1%, this variable will hold the value '.1%'
     
     // get numbers for the new problem, based on user's choice of options
     function generateNumbers() {        
+        smallPct = false; // this will be switched later if number is less than 1%
+        
         if (document.getElementById('bigRange').checked) { // allow numbers outside range of 1-100%
-            // since most percents are between 1 and 100, I want ~75% of questions to look like
-            var i = Math.floor(Math.random()*8 + 1);
+            // 60% of the questions will still be between 1 and 100
+            var i = Math.floor(Math.random()*5+ 1);
         }
         else { // default; percent between 1 and 100%
-            var i = Math.floor(Math.random()*6 + 1);
+            var i = Math.floor(Math.random()*3 + 1);
         }
         
-        // if 'bigRange' is not checked, 7 and 8 are not possible values for i
-        if (i == 7) { // have a number greater than 100%; decimal 1.00 to 9.99 
+        // if 'bigRange' is not checked, 4 and 5 are not possible values for i
+        if (i == 5) { // have a number greater than 100%; decimal 1.00 to 9.99 
             var j = Math.floor(Math.random()*899 + 100); // integer b/t 1 and 9
             decimalNum = j / 100;
             percentNum = j;
         }
-        else if (i == 8) { // have the percent include a decimal; decimal 0.001 to 0.999
+        else if (i == 4) { // less than 1%
+            var j = Math.floor(Math.random()*9 + 1);
+            decimalNum = j / 1000;
+            percentNum = j / 10;
+            
+            smallPct = true;
+        }
+        else if (i == 3) { // include a decimal in the percent, e.g. 24.8%
             var j = Math.floor(Math.random()*999 + 1);
             decimalNum = j / 1000;
             percentNum = j / 10; 
@@ -89,6 +100,10 @@ span {
                 
                 answer = percentNum + '%';
                 missingPct = percentNum;
+                
+                if (smallPct == true) { // number is less than 1%
+                    missingZero = '.' + percentNum*10 + '%';
+                }
             }
             else {
                 document.getElementById('prompt').innerHTML = 'Convert to a decimal:';
@@ -112,6 +127,11 @@ span {
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
+        
+        // user is missing the zero before the decimal point on a percentage answer
+        if (smallPct == true) {
+            answer = document.forms[0].userAnswer.value;
+        }
         
         // give appropriate feedback        
         if (document.forms[0].userAnswer.value == missingPct) {
