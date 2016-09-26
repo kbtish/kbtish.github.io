@@ -1,0 +1,619 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Flashcards - GCF & LCM</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
+<style type='text/css'>
+span {
+    background-color: inherit;
+    font-weight: bold;
+}
+</style>
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    // global variables
+    var inputString; // holds the value input by the user
+    var firstNum;
+    var secondNum;
+    var answer; // holds the answer
+    var numAttempts = 0; // number of attempted problems
+    var numCorrect = 0; // number of correctly answered questions
+    var submissions; // keep track of how many times an answer is submitted for a given problem
+    var time; // seconds on the timer
+    var count; // will hold the number of seconds
+    var counter; // object/function to act as a timer
+    var running = false; // tells whether or not the timer is running
+    var device = 'desktop'; // can be changed to mobile; difference is in autofocus
+    var verified = true; // verify that at least one operation and one digit are selected
+    var wrongAnswers = new Array(); // will hold and display incorrect answers after 1-minute timer
+    var userAnswers = new Array(); // will hold and display user's answers that were incorrect
+    var correctAnswers = new Array(); // will hold and display correct answers for missed questions on 1-min timer
+    var numWrong = 0; // holds the number of incorrect answers given during 1-minute timer
+    
+    // get numbers for the new problem
+    function generateNumbers() {
+        selectQuestionType();
+        
+        submissions = 0; // no answers have been submitted for the given problem
+    }
+
+
+    
+    // determine what kind of question to display
+    function selectQuestionType() {
+        // local variables
+        var numSelected = 0; // number of selected operations; reset to zero each time the function is called
+        var question = new Array(); // array to hold question types
+        var i; // will hold a random number
+        
+        // add checked operations to question array
+        if (document.forms[0].gcf.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'gcf';
+        }
+        if (document.forms[0].lcm.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'lcm';
+        }
+        
+        if (numSelected == 0) { // no question type selected
+            window.alert('Select at least one type of question.');
+            return;
+        }
+
+        // randomly select which type of operation to do
+        i = Math.floor(Math.random() * numSelected);
+        if (question[i] == 'gcf') {
+            getGCFProblem();
+        }
+        else if (question[i] == 'lcm') {
+            getLCMProblem();
+        }
+        else {
+            document.getElementById('repeatAnswer').innerHTML = "<br />";
+            document.getElementById('feedback').innerHTML = "<br />";
+            document.getElementById('answer').innerHTML = "<br />";
+            clearAnswer(); // reset the input box
+        }
+    } // end of selectQuestionType()
+    
+    // create a GCF problem
+    function getGCFProblem() {
+        firstNum = Math.floor(Math.random()*24 + 2);
+        secondNum = Math.floor(Math.random()*24 + 2);
+        
+        while (firstNum == secondNum) { // make sure numbers are different
+            secondNum = Math.floor(Math.random()*24 + 2);
+        }
+        
+        document.getElementById('prompt').innerHTML = 'Greatest Common Factor:';
+        document.getElementById('problemSpace').innerHTML = 'GCF(' + firstNum + ', ' + secondNum + ') = ?';
+        
+        answer = hcf(firstNum, secondNum);
+    }
+    
+    // create an LCM problem
+    function getLCMProblem() {
+        firstNum = Math.floor(Math.random()*11 + 2);
+        secondNum = Math.floor(Math.random()*11 + 2);
+        
+        while (firstNum == secondNum) {
+            secondNum = Math.floor(Math.random()*11 + 2);
+        }
+        
+        document.getElementById('prompt').innerHTML = 'Least Common Multiple:';
+        document.getElementById('problemSpace').innerHTML = 'LCM(' + firstNum + ', ' + secondNum + ') = ?';
+        
+        answer = lcm(firstNum, secondNum);
+    }
+    
+    // find the GCF
+    function hcf(text1,text2){
+      var gcd=1;
+      if (text1>text2) {text1=text1+text2; text2=text1-text2; text1=text1-text2;}
+      if ((text2==(Math.round(text2/text1))*text1)) {gcd=text1}else {
+       for (var i = Math.round(text1/2) ; i > 1; i=i-1) {
+        if ((text1==(Math.round(text1/i))*i))
+         if ((text2==(Math.round(text2/i))*i)) {gcd=i; i=-1;}
+       }
+      }
+      return gcd;
+    }
+    
+    // find the LCM
+    function lcm(t1,t2){
+      var cm=1;
+      var f=hcf(t1,t2);
+      cm=t1*t2/f;
+      return cm;
+    }
+    
+    // check the answer and give feedback
+    function checkAnswer() {
+        // make sure user inputs an answer
+        if (document.forms[0].userAnswer.value == '') { // input is blank
+            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
+            document.getElementById('feedback').innerHTML = '<br />';
+            return false;
+        }
+        
+        submissions++; // increment the number of submitted answers for the given problem
+        
+        // display user's answer               
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
+        // give appropriate feedback
+        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+            // track stats
+            if (submissions == 1) {
+                numCorrect++;
+            }
+            
+            if (document.forms[0].playVideo.checked == true) {
+                playCorrectAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            document.forms[0].newProblem.focus();
+        }
+        else { // answer is incorrect
+            if (document.forms[0].playVideo.checked == true) {
+                playWrongAnswer();
+            }
+    
+            document.getElementById('feedback').innerHTML = 'Not quite.';
+            
+            if (running == true) { // timer is running
+                // show correct answer so user doesn't need to click "Show Answer" button
+                document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+                
+                // keep track of incorrect answers
+                if (submissions == 1) {
+                    wrongAnswers[numWrong] = document.getElementById('problemSpace').innerHTML;
+                    userAnswers[numWrong] = document.forms[0].userAnswer.value;
+                    correctAnswers[numWrong] = answer;
+                    numWrong++;
+                }
+            }
+            document.forms[0].newProblem.focus();
+        }
+        
+        incrementAttempts();
+        calculateStats();
+        
+        return false;
+    } // end of checkAnswer()
+    
+    // if this is the first attempt at a problem, we need to increment the total of attempts
+    function incrementAttempts() {
+        if (submissions == 1) {
+            numAttempts++;
+        }
+    }
+    
+    // allow numberpad to type in answer
+    function updateString(value) {
+        inputString += value;
+        document.forms[0].userAnswer.value = inputString;
+    }
+ 
+    // clear button to reset the form
+    function clearAnswer() {
+        document.forms[0].userAnswer.value = "";
+        inputString = "";
+    }
+    
+    // show the correct answer
+    function showAnswer() {
+        document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+        
+        // if no answer has been submitted, this will count as a wrong answer
+        submissions++;
+        incrementAttempts();
+        calculateStats();
+    }
+    
+    // set or reset the video frame to blank
+    function resetVideoFrame() {
+        document.getElementById('videoSpace').innerHTML = '<video width="240" height="132"></video>';
+    }
+    
+    // reset the statistics
+    function resetStats() {
+        numAttempts = 0;
+        numCorrect = 0;
+        
+        document.getElementById('attempted').innerHTML = '';
+        document.getElementById('correct').innerHTML = '';
+        document.getElementById('percent').innerHTML = '';
+        
+        loadPage();
+    }
+    
+    // hide the statistics
+    function hideStats() {
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('resetBtn').style.visibility = 'hidden';
+        document.getElementById('hideStatsBtn').style.visibility = 'hidden';
+        document.getElementById('showStatsBtn').style.display = 'inline';
+    }
+    
+    // show the statistics
+    function showStats() {
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('resetBtn').style.visibility = 'visible';
+        document.getElementById('hideStatsBtn').style.visibility = 'visible';
+        document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
+    // calculate and update the statistics
+    function calculateStats() {
+        var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';        
+    }
+    
+    // run the timer; see also timer() function
+    function startTimer() {
+        var i = document.forms[0].timeLimit.value;
+        
+        if (i == 'oneMin') {
+            time = 60;
+        }
+        else if (i == 'fiveMin') {
+            time = 300;
+        }
+
+        resetStats(); // reset stats and get a new problem
+        
+        running = true;
+        
+        count = time - 1; // set the time in seconds
+        
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
+
+        document.getElementById('timerPrompt').innerHTML = 'Time:'; 
+        
+        document.getElementById('timer').style.display = 'inline'; // display the time remaining
+        document.getElementById('startBtn').style.display = 'none'; // hide the Start button
+        document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        document.getElementById('timeLimit').style.display = 'none'; // hide the selection list
+        
+        // disable options
+        document.getElementById('hideStatsBtn').disabled = true;
+        document.getElementById('resetBtn').disabled = true;
+        document.getElementById('showStatsBtn').disabled = true;
+        document.getElementById('playVideo').disabled = true;
+        document.getElementById('playVideo').checked = false;
+        
+        document.getElementById('addition').disabled = true;
+        document.getElementById('subtraction').disabled = true;
+        document.getElementById('multiplication').disabled = true;
+        document.getElementById('division').disabled = true;
+        document.getElementById('allOpsBtn').disabled = true;
+        document.getElementById('clearOpsBtn').disabled = true;
+        document.getElementById('allDigitsBtn').disabled = true;
+        document.getElementById('clearDigitsBtn').disabled = true;
+        document.forms[0].digitZero.disabled = true;
+        document.forms[0].digitOne.disabled = true;
+        document.forms[0].digitTwo.disabled = true;
+        document.forms[0].digitThree.disabled = true;
+        document.forms[0].digitFour.disabled = true;
+        document.forms[0].digitFive.disabled = true;
+        document.forms[0].digitSix.disabled = true;
+        document.forms[0].digitSeven.disabled = true;
+        document.forms[0].digitEight.disabled = true;
+        document.forms[0].digitNine.disabled = true;
+    } // end of startTimer()
+    
+    // more running of the timer
+    function timer() {
+        document.getElementById("timer").innerHTML = count + " seconds<br />";
+        
+        count = count - 1;
+        if (count < 0) { // when time is up...           
+            window.alert('Time\'s up!'); // display a message
+            
+            var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+            var i;
+            
+            if (time == 60) {
+                i = '1 minute';
+            }
+            else {
+                i = '5 minutes';
+            }
+            window.alert('Time: ' + i +
+                         '\nNumber correct: ' + numCorrect + 
+                         '\nPercent correct: ' + pctCorrect + '%');
+            
+            var displayWrong = ''; // generate a string literal to display all wrong answers
+            for (j=0; j<numWrong; j++) {
+                displayWrong = displayWrong + '\n\n' + wrongAnswers[j] +
+                    '\nYour answer: ' + userAnswers[j] +
+                    '\nCorrect answer: ' + correctAnswers[j];
+            }
+            
+            window.alert('Problems to practice... ' + displayWrong);
+           
+            stopTimer();
+            
+            return;
+        }
+    } // end of timer()
+    
+    // stop the timer
+    function stopTimer() {
+        numWrong = 0; // this will ultimately reset the displayWrong string
+        
+        clearInterval(counter); // stop the timer
+        running = false;
+        
+
+        document.getElementById('timerPrompt').innerHTML = 'Set the timer';
+
+        document.getElementById('startBtn').style.display = 'inline'; // show the start button
+        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
+        document.getElementById('timer').style.display = 'none'; // hide the time remaining
+        
+        // enable options
+        document.getElementById('hideStatsBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('playVideo').disabled = false;
+        
+        document.getElementById('addition').disabled = false;
+        document.getElementById('subtraction').disabled = false;
+        document.getElementById('multiplication').disabled = false;
+        document.getElementById('division').disabled = false;
+        document.getElementById('allOpsBtn').disabled = false;
+        document.getElementById('clearOpsBtn').disabled = false;
+        document.getElementById('allDigitsBtn').disabled = false;
+        document.getElementById('clearDigitsBtn').disabled = false;
+        document.forms[0].digitZero.disabled = false;
+        document.forms[0].digitOne.disabled = false;
+        document.forms[0].digitTwo.disabled = false;
+        document.forms[0].digitThree.disabled = false;
+        document.forms[0].digitFour.disabled = false;
+        document.forms[0].digitFive.disabled = false;
+        document.forms[0].digitSix.disabled = false;
+        document.forms[0].digitSeven.disabled = false;
+        document.forms[0].digitEight.disabled = false;
+        document.forms[0].digitNine.disabled = false;
+    } // end of stopTimer()
+    
+    // change the autofocus to support mobile and tablet devices
+    function changeToMobile() {
+        device = 'mobile';
+        loadPage();
+    }
+    
+    // change the autofocus to support desktop devices
+    function changeToDesktop() {
+        device = 'desktop';
+        loadPage();
+    }
+    
+    // call necessary functions when page loads
+    function loadPage() {
+        if (running == false) {
+                document.getElementById('timer').innerHTML = time + ' seconds<br />';
+        }
+        
+        if (device == 'desktop') {
+            // autofocus on the input box
+            document.forms[0].userAnswer.focus();
+            
+            // change the display
+            document.getElementById('version').innerHTML =
+                'You are using the desktop version.' +
+                '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
+        }
+        else {            
+            // change the display
+            document.getElementById('version').innerHTML =
+                'You are using the mobile/tablet version.' +
+                '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+        }
+
+        clearAnswer();
+        generateNumbers();
+        document.getElementById('repeatAnswer').innerHTML = '';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('answer').innerHTML = '';
+        resetVideoFrame();
+        
+    }
+    // video feedback for correct answers
+    function playCorrectAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="reallyGoodAtMath" width="240" height="132">' +
+                        '<source src="../../files/really good at math.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(reallyGoodAtMath);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="smrt" width="240" height="132">' +
+                        '<source src="../../files/smrt.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(smrt);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    // video feedback for wrong answers
+    function playWrongAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                        '<video id="what" width="240" height="132">' +
+                            '<source src="../../files/what.mp4" type="video/mp4"></source>' +
+                        '</video>';
+                playVideo(what);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="notEvenClose" width="240" height="132">' +
+                        '<source src="../../files/not even close.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(notEvenClose);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // play whichever video is called
+    function playVideo(video) {
+        video.play();
+        video.onended = function() { // when the video ends
+            resetVideoFrame();    
+        }
+    }
+    /* ]]> */
+</script>
+</head>
+
+<body onload='return loadPage();'>
+
+<div id="header">
+<script src='../../external javascript files/header.js'></script>
+</div>
+
+<div id="nav">
+<script src='../../external javascript files/nav.js'></script>
+</div>
+
+<div id="section">
+<h2>Flash Cards - GCF and LCM</h2>
+<form action=''>
+    <div id='version'>
+        <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
+    </div>
+    
+    <table>
+    <tr>
+    <td style='border:solid; width:30%; min-width:190px; padding:5px;'>
+        <span id='prompt'>&nbsp;</span>
+        <br /><br />
+        &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
+        <br /><br />
+        
+        <!-- input box for user's answer -->
+        Answer:<input type='text' name='userAnswer' size='4' />
+        <br /><br />
+        
+        <!-- keypad -->
+        <input type='button' name='seven' style='width:60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width:60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width:60px; height:30px;' value='9' onclick='updateString("9");' />
+        <br />
+        <input type='button' name='four' style='width:60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width:60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width:60px; height:30px;' value='6' onclick='updateString("6");' />
+        <br />
+        <input type='button' name='one' style='width:60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
+        <br />
+        <input type='button' name='zero' style='width:92px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='clear' style='width:92px; height:30px;' value='Clear' onclick='clearAnswer();' />
+        <br />
+        <br />
+        <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
+        <br />
+        
+        <span id='repeatAnswer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='feedback'><br /></span>
+        &nbsp;
+        <br />
+        
+        <!-- button to generate a new problem -->
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='return loadPage();' />
+        <br />
+        
+        <!-- button to show correct answer -->
+        <input type='button' value='Show answer' style='height:30px;' onclick='showAnswer();' />
+        <br />
+        
+        <span id='answer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='closingMessage'>&nbsp;</span>
+    </td>
+    
+    <td style='margin-left:15px; width:30%; border:none; text-align:right; vertical-align:top;'>
+        <!-- timer -->
+        <div>
+            <span id='timerPrompt'>Set the timer</span>
+            <br />
+            <select name='timeLimit' id='timeLimit'>
+                <option value='oneMin'>1 minute</option>
+                <option value='fiveMin'>5 minutes</option>
+            </select>
+        </div>
+        <div id='timer' style='display:none;'></div>
+        <input type='button' id='startBtn' value='Start' style='height:30px;' onclick='startTimer();' />
+        <input type='button' id='stopBtn' value='Stop' style='height:30px; display:none;' onclick='stopTimer();' />
+        <br /><br />
+
+        
+        <!-- stats -->
+        <div id='stats'>
+            <span style='text-decoration:underline;'>Statistics</span><br />
+            Problems attempted: <span id='attempted'>&nbsp;</span><br />
+            Number correct: <span id='correct'>&nbsp;</span><br />
+            Percent correct: <span id='percent'>&nbsp;</span><br />
+        </div>
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
+        <input type='button' id='resetBtn' value='Reset' style='height:30px;' onclick='resetStats()' />
+        <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
+        <br /><br />
+        
+        <!-- choose GCF and/or lCM -->
+        <span style='text-decoration:underline;'>Type(s) of question</span>
+        <br />
+        Greatest Common Factor<input type='checkbox' name='gcf' id='gcf' checked />
+        <br />
+        Least Common Multiple<input type='checkbox' name='lcm' id='lcm' checked />
+        <br />
+        <!-- button to generate a new problem -->
+        <input type='button' value='New problem' style='height:30px;' onclick='return loadPage();' />
+        <br /><br />
+        
+        <!-- checkbox for video feedback -->
+        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
+        <br />
+        
+        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
+        
+    </td>
+    </tr>
+    </table>
+</form>
+
+</div>
+
+<div id="footer">
+<script src='../../external javascript files/footer.js'></script>
+</div>
+
+</body>
+</html>
