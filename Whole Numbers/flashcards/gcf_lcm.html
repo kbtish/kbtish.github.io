@@ -11,6 +11,11 @@ span {
     font-weight: bold;
 }
 </style>
+
+<!-- external js for a random number generator -->
+<script src='../../external javascript files/random_number_generator.js'></script>
+<!-- external js to generate specific numbers for GFC -->
+<script src='../../external javascript files/gcf_numbers.js'></script>
 <script type="text/javascript">
     /* <![CDATA[ */
     
@@ -82,11 +87,35 @@ span {
     
     // create a GCF problem
     function getGCFProblem() {
-        firstNum = Math.floor(Math.random()*24 + 2);
-        secondNum = Math.floor(Math.random()*24 + 2);
+        firstNum = getGCFNumber(); // external js
+        secondNum = getGCFNumber(); // external js
         
-        while (firstNum == secondNum) { // make sure numbers are different
-            secondNum = Math.floor(Math.random()*24 + 2);
+        var x = hcf(firstNum, secondNum);
+        
+        // reduce the incidence of the GCF being 1 and 2
+        if (x == 1) {
+            var i = getNumber(0, 1);
+            
+            if (i == 0) { // get a GCF not equal to 1
+                while (x == 1) {
+                    firstNum = getGCFNumber(); // external js
+                    secondNum = getGCFNumber(); // external js
+                    
+                    x = hcf(firstNum, secondNum);
+                }                
+            }
+        }
+        if (x == 2) {
+            var i = getNumber(0, 2);
+            
+            if (i == 0) { // get a GCF not equal to 2
+                while (x == 1 || x == 2) {
+                    firstNum = getGCFNumber(); // external js
+                    secondNum = getGCFNumber(); // external js
+                    
+                    x = hcf(firstNum, secondNum);
+                }
+            }
         }
         
         document.getElementById('prompt').innerHTML = 'Greatest Common Factor:';
@@ -97,12 +126,8 @@ span {
     
     // create an LCM problem
     function getLCMProblem() {
-        firstNum = Math.floor(Math.random()*11 + 2);
-        secondNum = Math.floor(Math.random()*11 + 2);
-        
-        while (firstNum == secondNum) {
-            secondNum = Math.floor(Math.random()*11 + 2);
-        }
+        firstNum = getNumber(2, 12); // external js
+        secondNum = getNumber(2, 12); // external js
         
         document.getElementById('prompt').innerHTML = 'Least Common Multiple:';
         document.getElementById('problemSpace').innerHTML = 'LCM(' + firstNum + ', ' + secondNum + ') = ?';
@@ -612,7 +637,6 @@ span {
 </div>
 
 <div id="footer">
-<script src='../../external javascript files/footer.js'></script>
 </div>
 
 </body>
