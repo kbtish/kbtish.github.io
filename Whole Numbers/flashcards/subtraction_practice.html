@@ -441,9 +441,10 @@ span {
     }
     /* ]]> */
 </script>
+<script src='../../external javascript files/welcome_options.js'></script>
 </head>
 
-<body onload='loadPage();'>
+<body onload='welcome(); loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>
@@ -553,8 +554,8 @@ span {
             Digits for the first number
             <select name='firstDigits' id='firstDigitsSelect'>
                 <option value='1'>1</option>
-                <option value='2' selected='selected'>2</option>
-                <option value='3'>3</option>
+                <option value='2'>2</option>
+                <option value='3' selected='selected'>3</option>
                 <option value='4'>4</option>
             </select>
         </span>
@@ -564,7 +565,7 @@ span {
             Digits for the second number
             <select name='secondDigits' id='secondDigitsSelect'>
                 <option value='1'>1</option>
-                <option value='2'>2</option>
+                <option value='2' selected='selected'>2</option>
                 <option value='3'>3</option>
                 <option value='4'>4</option>
             </select>

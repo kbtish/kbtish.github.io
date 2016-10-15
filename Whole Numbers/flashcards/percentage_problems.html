@@ -432,9 +432,10 @@ span {
     }
     /* ]]> */
 </script>
+<script src='../../external javascript files/welcome_options.js'></script>
 </head>
 
-<body onload='loadPage();'>
+<body onload='welcome(); loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>
@@ -540,8 +541,8 @@ span {
         <div>
             <span style='text-decoration:underline;'>Type(s) of question</span><br />
             Find the part<input type='checkbox' name='type1' checked='checked' /><br />
-            Find the percent<input type='checkbox' name='type2' /><br />
-            Find the whole <input type='checkbox' name='type3' />
+            Find the percent<input type='checkbox' name='type2' checked='checked' /><br />
+            Find the whole <input type='checkbox' name='type3' checked='checked' />
         </div>
         <br />
         <!-- button to generate a new problem -->

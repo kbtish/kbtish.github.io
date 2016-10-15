@@ -625,9 +625,10 @@ span {
     }
     /* ]]> */
 </script>
+<script src='../../external javascript files/welcome_options.js'></script>
 </head>
 
-<body onload='return loadPage();'>
+<body onload='welcome(); return loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>
@@ -742,10 +743,10 @@ span {
             Operation(s) to practice<br />
             Add<input type='checkbox' name='addition' id='addition' checked='checked' />
             &nbsp;&nbsp;&nbsp;
-            Subtract<input type='checkbox' name='subtraction' id='subtraction' /><br />
-            Multiply<input type='checkbox' name='multiplication' id='multiplication' />
+            Subtract<input type='checkbox' name='subtraction' id='subtraction' checked='checked' /><br />
+            Multiply<input type='checkbox' name='multiplication' id='multiplication' checked='checked' />
             &nbsp;&nbsp;&nbsp;
-            Divide<input type='checkbox' name='division' id='division' /><br />
+            Divide<input type='checkbox' name='division' id='division' checked='checked' /><br />
             <input type='button' value='Select all' id='allOpsBtn' style='height:30px;' onclick='selectAllOperations();' />
             <input type='button' value='Clear all' id='clearOpsBtn' style='height:30px;' onclick='clearAllOperations();' />
         </span>

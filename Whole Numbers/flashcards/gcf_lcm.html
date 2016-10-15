@@ -90,38 +90,40 @@ span {
         firstNum = getGCFNumber(); // external js
         secondNum = getGCFNumber(); // external js
         
-        var x = hcf(firstNum, secondNum);
+        while (firstNum == secondNum) { // prevent both numbers being the same
+            secondNum = getGCFNumber(); // external js
+        }
+        
+        answer = hcf(firstNum, secondNum);
         
         // reduce the incidence of the GCF being 1 and 2
-        if (x == 1) {
-            var i = getNumber(0, 1);
+        if (answer == 1) {
+            var i = getNumber(0, 2);
             
-            if (i == 0) { // get a GCF not equal to 1
-                while (x == 1) {
+            if (i < 2) { // get a GCF not equal to 1
+                while (answer == 1) {
                     firstNum = getGCFNumber(); // external js
                     secondNum = getGCFNumber(); // external js
                     
-                    x = hcf(firstNum, secondNum);
+                    answer = hcf(firstNum, secondNum);
                 }                
             }
         }
-        if (x == 2) {
+        if (answer == 2) {
             var i = getNumber(0, 2);
             
-            if (i == 0) { // get a GCF not equal to 2
+            if (i < 2) { // get a GCF not equal to 2
                 while (x == 1 || x == 2) {
                     firstNum = getGCFNumber(); // external js
                     secondNum = getGCFNumber(); // external js
                     
-                    x = hcf(firstNum, secondNum);
+                    answer = hcf(firstNum, secondNum);
                 }
             }
         }
         
         document.getElementById('prompt').innerHTML = 'Greatest Common Factor:';
         document.getElementById('problemSpace').innerHTML = 'GCF(' + firstNum + ', ' + secondNum + ') = ?';
-        
-        answer = hcf(firstNum, secondNum);
     }
     
     // create an LCM problem
@@ -510,9 +512,10 @@ span {
     }
     /* ]]> */
 </script>
+<script src='../../external javascript files/welcome_options.js'></script>
 </head>
 
-<body onload='return loadPage();'>
+<body onload='welcome(); return loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>

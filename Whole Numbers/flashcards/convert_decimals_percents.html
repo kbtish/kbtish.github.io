@@ -439,9 +439,10 @@ span {
     }
     /* ]]> */
 </script>
+<script src='../../external javascript files/welcome_options.js'></script>
 </head>
 
-<body onload='loadPage();'>
+<body onload='welcome(); loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>
@@ -549,7 +550,7 @@ span {
             <input type='checkbox' name='decToPct' id='decToPct' checked />
             <br />
             Percent to decimal
-            <input type='checkbox' name='pctToDec' id='pctToDec' />
+            <input type='checkbox' name='pctToDec' id='pctToDec' checked />
             <br />
             <!--
             Fraction to decimal
@@ -565,7 +566,7 @@ span {
             <input type='checkbox' name='fracToPct' id='fracToPct' />
             -->
             <br /><br />
-            <span title='Selecting "yes" will allow percents greater than 100 or less than'>
+            <span title='Selecting "yes" will allow percents greater than 100 or less than 1'>
                 Extend the range of possible numbers?
             </span>
             <br />
