@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Flashcards - Percentage Problems</title>
+<title>Flashcards - Unit Conversions</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -11,6 +11,7 @@ span {
     font-weight: bold;
 }
 </style>
+<script src='../../external javascript files/random_number_generator.js'></script>
 <script type="text/javascript">
     /* <![CDATA[ */
     
@@ -25,9 +26,8 @@ span {
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
-    var version; // stores the type of problem
-    var missingPercent; // if the answer is a percent, this variable will hold the answer without a % symbol
     var problem;
+    var displayNum; // number to be converted
     
     function selectType() {
         // local variables
@@ -54,62 +54,151 @@ span {
             window.alert('Please select at least one problem type.');
         }
         
-        generateNumbers(); // get numbers for the problem
+        submissions = 0;
         
         // randomly select which problem type to display
         i = Math.floor(Math.random() * numSelected);
         if (question[i] == 'type1') {
             createType1();
-            version = 1;
         }
         else if (question[i] == 'type2') {
             createType2();
-            version = 2;
         }
         else if (question[i] == 'type3') {
             createType3();
-            version = 3;
         }
     } // end of function selectType()
-
-    // get numbers for the new problem, based on user's choice of options
-    function generateNumbers() {        
-        total = Math.floor((Math.random() * 1000) + 1);
-        part = Math.floor((Math.random() * total) + 1); // part willl not exceed the total
-        percent  = Math.floor((Math.random() * 100) + 1);        
-        submissions = 0; // no answers have been submitted for the given problem       
-    } // end of generateNumbers()
     
-    // use the percent and whole to find the part
-    function createType1() {        
-        problem = 'What is ' + percent + '% of ' + total + '?';
-        answer = (percent / 100 * total).toFixed(0);
+    // convert between feet and inches
+    function createType1() {
+        // decide which way to give the conversion factor
+        if (getNumber(0,1) == 0) {
+            problem = 'Given 1 foot = 12 inches<br /><br />';
+        }
+        else {
+            problem = 'Given 12 inches = 1 foot<br /><br />';
+        }
+        
+        var i = getNumber(0,1); // external js
+        
+        if (i == 0) { // start with feet
+            displayNum = getNumber(0.1, 83);
+            
+            // use whole numbers most of the time
+            if ((displayNum >= 1) && (getNumber(0,3) < 3)) {
+                displayNum = Math.floor(displayNum);
+            }
+        
+            problem += 'Convert ' + displayNum + ' feet to inches';
+            
+            answer = (displayNum * 12).toFixed(1); // convert feet to inches, round to nearest tenth
+        }
+        else { // start with inches
+            displayNum = getNumber(1, 200); // external js
+            
+            // use decimals occasionally
+            if (getNumber(0,3) < 1) {
+                displayNum += getNumber(0.1, 0.9);
+            }
+            
+            problem += 'Convert ' +displayNum + ' inches to feet';
+            
+            answer = (displayNum / 12).toFixed(1);
+        }
         
         // display problem
         document.getElementById('problemSpace').innerHTML = problem;
     } // end of function createType1()
     
-    // use the part and whole to find the percent
+    // convert between minutes and seconds
     function createType2() {
-        problem = part + ' is what percent of ' + total + '?';
-        missingPercent = (part / total * 100).toFixed(0);
-        answer = missingPercent + '%';
+        // decide which way to give the conversion factor
+        if (getNumber(0,1) == 0) {
+            problem = 'Given 1 minute = 60 seconds<br /><br />';
+        }
+        else {
+            problem = 'Given 60 seconds = 1 minute<br /><br />';
+        }
+        
+        var i = getNumber(0,1); // external js
+        
+        if (i == 0) { // start with minutes
+            displayNum = getNumber(0.1, 16);
+            
+            // use whole numbers most of the time
+            if ((displayNum >= 1) && (getNumber(0,3) < 3)) {
+                displayNum = Math.floor(displayNum);
+            }
+        
+            problem += 'Convert ' + displayNum + ' minutes to seconds';
+            
+            answer = (displayNum * 60).toFixed(1); // convert minutes to seconds, round to nearest tenth
+        }
+        else { // start with seconds
+            displayNum = getNumber(3, 200); // external js
+            
+            // use decimals occasionally
+            if (getNumber(0,3) < 1) {
+                displayNum += getNumber(0.1, 0.9);
+            }
+            
+            problem += 'Convert ' +displayNum + ' seconds to minutes';
+            
+            answer = (displayNum / 60).toFixed(1);
+        }
         
         // display problem
         document.getElementById('problemSpace').innerHTML = problem;
     }
     
-    // use the part and percent to find the whole
+    // convert between pounds and ounces
     function createType3() {
-        problem = part + ' is ' + percent + '% of what?';
-        answer = (part * 100 / percent).toFixed(0);
+        // decide which way to give the conversion factor
+        if (getNumber(0,1) == 0) {
+            problem = 'Given 1 pound = 16 ounces<br /><br />';
+        }
+        else {
+            problem = 'Given 16 ounces = 1 pound<br /><br />';
+        }
         
+        var i = getNumber(0,1); // external js
+        
+        if (i == 0) { // start with ounces
+            displayNum = getNumber(0.1, 62);
+            
+            // use whole numbers most of the time
+            if ((displayNum >= 1) && (getNumber(0,3) < 3)) {
+                displayNum = Math.floor(displayNum);
+            }
+        
+            problem += 'Convert ' + displayNum + ' pounds to ounces';
+            
+            answer = (displayNum * 16).toFixed(1); // convert feet to inches, round to nearest tenth
+        }
+        else { // start with ounces
+            displayNum = getNumber(1, 999); // external js
+            
+            // use decimals occasionally
+            if (getNumber(0,3) < 1) {
+                displayNum += getNumber(0.1, 0.9);
+            }
+            
+            problem += 'Convert ' +displayNum + ' ounces to pounds';
+            
+            answer = (displayNum / 16).toFixed(1);
+        }
         // display problem
         document.getElementById('problemSpace').innerHTML = problem;
     }
  
     // check the answer and give feedback
     function checkAnswer() {
+        var pointZero = false; // true if answer rounds to "point zero"
+        
+        if (document.forms[0].userAnswer.value == Math.floor(answer) && 10*answer%10 == 0) {
+            pointZero = true;
+        }
+        
         // make sure user inputs an answer
         if (document.forms[0].userAnswer.value == '') { // input is blank
             document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
@@ -123,7 +212,7 @@ span {
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
         
         // give appropriate feedback        
-        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+        if (document.forms[0].userAnswer.value == answer || pointZero == true) { // answer is correct
             // track stats
             if (submissions == 1) {
                 numCorrect++;
@@ -134,20 +223,6 @@ span {
             }
             document.getElementById('feedback').innerHTML = 'Correct!';
             document.forms[0].newProblem.focus();
-        }
-        else if ((version==2) && (document.forms[0].userAnswer.value==missingPercent)) {
-            // user forgot to include the % symbol
-            if (document.forms[0].playVideo.checked == true) {
-                document.getElementById('videoSpace').innerHTML =
-                    '<video id="partialCredit" width="240" height="132">' +
-                        '<source src="../../files/partial credit.mp4" type="video/mp4"></source>' +
-                    '</video>';
-                playVideo(partialCredit);
-            }
-            
-            submissions--; // don't count this against the user
-            document.getElementById('feedback').innerHTML = 'Don\'t forget the %.';
-            document.forms[0].percent.focus();            
         }
         else { // answer is incorrect
             if (document.forms[0].playVideo.checked == true) {
@@ -446,7 +521,7 @@ span {
 </div>
 
 <div id="section">
-<h2>Percentage Problems</h2>
+<h2>Unit Conversions</h2>
 <form action=''>
     <div id='version'>
         <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
@@ -454,14 +529,15 @@ span {
     
     <table>
     <tr>
-    <td style='border:solid; width:45%; min-width:190px; padding:5px;'>
+    <td style='border:solid; width:45%; min-width:290px; padding:5px;'>
         <span id='prompt'></span>
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
         <br /><br />
         
         <!-- input box for user's answer -->
-        Round to the nearest whole number<br />
+        Round to the nearest tenth if needed<br />
+        (one decimal place)<br />
         Answer:<input type='text' name='userAnswer' size='6' />
         <br /><br />
         
@@ -480,11 +556,10 @@ span {
         <br />
         <input type='button' name='zero' style='width: 60px; height:30px;' value='0' onclick='updateString("0");' />
         <input type='button' name='point' style='width: 60px; height:30px;' value='.' onclick='updateString(".");' />
-        <input type='button' name='percent' style='width: 60px; height:30px;' value='%' onclick='updateString("%");' />                    
+        <input type='button' name='clear' style='width: 60px; height:30px;' value='Clear' onclick='clearAnswer();' />                    
         <br />
         <br />
         <input type='submit' value='Check my answer' style='width:120px; height:30px;' onclick=' return checkAnswer();' />
-        <input type='button' name='clear' style='width: 60px; height:30px;' value='Clear' onclick='clearAnswer();' />
         <br />
         
         <span id='repeatAnswer'><br /></span>
@@ -539,10 +614,10 @@ span {
         
         <!-- options -->
         <div>
-            <span style='text-decoration:underline;'>Type(s) of question</span><br />
-            Find the part<input type='checkbox' name='type1' checked='checked' /><br />
-            Find the percent<input type='checkbox' name='type2' checked='checked' /><br />
-            Find the whole<input type='checkbox' name='type3' checked='checked' />
+            <span style='text-decoration:underline;'>Convert between...</span><br />
+            Feet & Inches<input type='checkbox' name='type1' checked='checked' /><br />
+            Minutes & Seconds<input type='checkbox' name='type2' checked='checked' /><br />
+            Pounds & Ounces<input type='checkbox' name='type3' checked='checked' />
         </div>
         <br />
         <!-- button to generate a new problem -->
