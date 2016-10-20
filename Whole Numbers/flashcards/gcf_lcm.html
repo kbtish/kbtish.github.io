@@ -12,9 +12,9 @@ span {
 }
 </style>
 
-<!-- external js for a random number generator -->
+<!-- function getNumber() -->
 <script src='../../external javascript files/random_number_generator.js'></script>
-<!-- external js to generate specific numbers for GFC -->
+<!-- function getGCFNumber() -->
 <script src='../../external javascript files/gcf_numbers.js'></script>
 <script type="text/javascript">
     /* <![CDATA[ */
@@ -52,7 +52,6 @@ span {
         // local variables
         var numSelected = 0; // number of selected operations; reset to zero each time the function is called
         var question = new Array(); // array to hold question types
-        var i; // will hold a random number
         
         // add checked operations to question array
         if (document.forms[0].gcf.checked == true) {
@@ -70,14 +69,14 @@ span {
         }
 
         // randomly select which type of operation to do
-        i = Math.floor(Math.random() * numSelected);
+        var i = Math.floor(Math.random() * numSelected);
         if (question[i] == 'gcf') {
             getGCFProblem();
         }
         else if (question[i] == 'lcm') {
             getLCMProblem();
         }
-        else {
+        else { // nothing was selected
             document.getElementById('repeatAnswer').innerHTML = "<br />";
             document.getElementById('feedback').innerHTML = "<br />";
             document.getElementById('answer').innerHTML = "<br />";
@@ -113,7 +112,7 @@ span {
             var i = getNumber(0, 2);
             
             if (i < 2) { // get a GCF not equal to 2
-                while (x == 1 || x == 2) {
+                while (answer == 1 || answer == 2) {
                     firstNum = getGCFNumber(); // external js
                     secondNum = getGCFNumber(); // external js
                     
@@ -130,6 +129,25 @@ span {
     function getLCMProblem() {
         firstNum = getNumber(2, 12); // external js
         secondNum = getNumber(2, 12); // external js
+        
+        while (firstNum == secondNum) { // do not allow the numbers to be the same
+            secondNum = getNumber(2, 12); 
+        }
+        
+        answer = lcm(firstNum, secondNum);
+        
+        // cut down on LCM being just the product of the two #'s
+        if ((answer == firstNum*secondNum) && (getNumber(0,3) <3)) { 
+            firstNum = getNumber(2, 12); // external js
+            secondNum = getNumber(2, 12); // external js
+            
+            while (firstNum == secondNum) { // do not allow the numbers to be the same
+                secondNum = getNumber(2, 12); 
+            }
+            
+            answer = lcm(firstNum, secondNum);
+            
+        }
         
         document.getElementById('prompt').innerHTML = 'Least Common Multiple:';
         document.getElementById('problemSpace').innerHTML = 'LCM(' + firstNum + ', ' + secondNum + ') = ?';
@@ -573,7 +591,7 @@ span {
         <br />
         
         <!-- button to generate a new problem -->
-        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='return loadPage();' />
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
         <br />
         
         <!-- button to show correct answer -->
@@ -621,9 +639,9 @@ span {
         Greatest Common Factor<input type='checkbox' name='gcf' id='gcf' checked />
         <br />
         Least Common Multiple<input type='checkbox' name='lcm' id='lcm' checked />
-        <br />
+        <br /><br />
         <!-- button to generate a new problem -->
-        <input type='button' value='New problem' style='height:30px;' onclick='return loadPage();' />
+        <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
         <br /><br />
         
         <!-- checkbox for video feedback -->
@@ -640,6 +658,7 @@ span {
 </div>
 
 <div id="footer">
+    <script src='../../external javascript files/footer.js'></script>
 </div>
 
 </body>

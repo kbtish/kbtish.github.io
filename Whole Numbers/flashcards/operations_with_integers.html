@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Flashcards - Unit Conversions</title>
+<title>Flashcards - Operations with Integers</title>
 <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 <link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
 <style type='text/css'>
@@ -12,18 +12,18 @@ span {
 }
 </style>
 
-<!-- function getNumber(min, max) -->
+<!-- function getNumber() -->
 <script src='../../external javascript files/random_number_generator.js'></script>
-
-<!-- functions roundDecimalNumber(number, places), roundWholeNumber(number, value) -->
-<script src='../../external javascript files/round numbers.js'></script>
-
+<!-- function getGCFNumber() -->
+<script src='../../external javascript files/gcf_numbers.js'></script>
 <script type="text/javascript">
     /* <![CDATA[ */
     
     // global variables
     var inputString; // holds the value input by the user
-    var answer; // holds the answervar numAttempts = 0; // number of attempted problems
+    var firstNum;
+    var secondNum;
+    var answer; // holds the answer
     var numAttempts = 0; // number of attempted problems
     var numCorrect = 0; // number of correctly answered questions
     var submissions; // keep track of how many times an answer is submitted for a given problem
@@ -32,185 +32,108 @@ span {
     var counter; // object/function to act as a timer
     var running = false; // tells whether or not the timer is running
     var device = 'desktop'; // can be changed to mobile; difference is in autofocus
-    var problem;
-    var displayNum; // number to be converted
+    var verified = true; // verify that at least one operation and one digit are selected
+    var wrongAnswers = new Array(); // will hold and display incorrect answers after 1-minute timer
+    var userAnswers = new Array(); // will hold and display user's answers that were incorrect
+    var correctAnswers = new Array(); // will hold and display correct answers for missed questions on 1-min timer
+    var numWrong = 0; // holds the number of incorrect answers given during 1-minute timer
     
-    function selectType() {
-        // local variables
-        var numSelected = 0; // number of checkboxes selected for problem type
-        var question = new Array(); // array to hold problem types
-        var i; // will hold a random number
-        
-        // add checked operations to question array
-        if (document.forms[0].type1.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'type1';
-        }
-        if (document.forms[0].type2.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'type2';
-        }
-        if (document.forms[0].type3.checked == true) {
-            numSelected++;
-            question[numSelected-1] = 'type3';
-        }
-        
-        // make sure at least one type is selected
-        if (numSelected == 0) {
-            window.alert('Please select at least one problem type.');
-        }
+    // get numbers for the new problem
+    function generateNumbers() {
+        firstNum = getNumber(-9, 9); // random number between -9 and 9
+        secondNum = getNumber(-9, 9); // random number between -9 and 9
         
         submissions = 0;
         
-        // randomly select which problem type to display
+        selectQuestionType();
+    }
+    
+    // determine what kind of question to display
+    function selectQuestionType() {
+        // local variables
+        var numSelected = 0; // number of selected operations; reset to zero each time the function is called
+        var question = new Array(); // array to hold question types
+        var i; // will hold a random number
+        
+        // add checked operations to question array
+        if (document.forms[0].addition.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'addition';
+        }
+        if (document.forms[0].subtraction.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'subtraction';
+        }
+        if (document.forms[0].multiplication.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'multiplication';
+        }
+        if (document.forms[0].division.checked == true) {
+            numSelected++;
+            question[numSelected-1] = 'division';
+        }
+        
+        // randomly select which type of operation to do
         i = Math.floor(Math.random() * numSelected);
-        if (question[i] == 'type1') {
-            createType1();
+        if (question[i] == 'addition') {
+            additionProblem();
         }
-        else if (question[i] == 'type2') {
-            createType2();
+        else if (question[i] == 'subtraction') {
+            subtractionProblem();
         }
-        else if (question[i] == 'type3') {
-            createType3();
+        else if (question[i] == 'multiplication') {
+            multiplicationProblem();
         }
-    } // end of function selectType()
-    
-    // convert between feet and inches
-    function createType1() {
-        // decide which way to give the conversion factor
-        if (getNumber(0,1) == 0) {
-            problem = 'Given 1 foot = 12 inches<br /><br />';
+        else if (question[i] == 'division') {
+            divisionProblem();
+        }
+        else if (numSelected == 0) {
+            window.alert("Please select at least one operation.");
         }
         else {
-            problem = 'Given 12 inches = 1 foot<br /><br />';
+            document.getElementById('repeatAnswer').innerHTML = "<br />";
+            document.getElementById('feedback').innerHTML = "<br />";
+            document.getElementById('answer').innerHTML = "<br />";
+            clearAnswer(); // reset the input box
         }
-        
-        var i = getNumber(0,1); // external js
-        
-        if (i == 0) { // start with feet
-            displayNum = getNumber(1, 830)/10;
-            
-            // use whole numbers most of the time
-            if ((displayNum >= 1) && (getNumber(0,3) < 3)) {
-                displayNum = Math.floor(displayNum);
-            }
-        
-            problem += 'Convert ' + displayNum + ' feet to inches';
-            
-            answer = (displayNum * 12); // convert feet to inches
-            answer = roundDecimalNumber(answer, 1); // round to one decimal place
-        }
-        else { // start with inches
-            displayNum = getNumber(1, 200); // get a number between 1 and 200
-            
-            // use decimals occasionally
-            if (getNumber(0,3) < 1) {
-                displayNum += getNumber(1, 9)/10;
-            }
-            
-            problem += 'Convert ' + displayNum + ' inches to feet';
-            
-            answer = (displayNum / 12); // convert inches to feet
-            answer = roundDecimalNumber(answer, 1); // round to one decimal place
-        }
-        
-        // display problem
-        document.getElementById('problemSpace').innerHTML = problem;
-    } // end of function createType1()
-    
-    // convert between minutes and seconds
-    function createType2() {
-        // decide which way to give the conversion factor
-        if (getNumber(0,1) == 0) {
-            problem = 'Given 1 minute = 60 seconds<br /><br />';
-        }
-        else {
-            problem = 'Given 60 seconds = 1 minute<br /><br />';
-        }
-        
-        var i = getNumber(0,1);
-        
-        if (i == 0) { // start with minutes
-            displayNum = getNumber(1, 160)/10;
-            
-            // use whole numbers most of the time
-            if ((displayNum >= 1) && (getNumber(0,3) < 3)) {
-                displayNum = Math.floor(displayNum);
-            }
-        
-            problem += 'Convert ' + displayNum + ' minutes to seconds';
-            
-            answer = (displayNum * 60); // convert minutes to seconds
-            answer = roundDecimalNumber(answer, 1); // round to one decimal place
-        }
-        else { // start with seconds
-            displayNum = getNumber(3, 999); // external js
-            
-            // use decimals occasionally
-            if (getNumber(0,3) < 1) {
-                displayNum += getNumber(1, 9)/10;
-            }
-            
-            problem += 'Convert ' + displayNum + ' seconds to minutes';
-            
-            answer = (displayNum / 60); // convert seconds to minutes
-            answer = roundDecimalNumber(answer, 1); // round to one decimal place
-        }
-        
-        // display problem
-        document.getElementById('problemSpace').innerHTML = problem;
     }
     
-    // convert between pounds and ounces
-    function createType3() {
-        // decide which way to give the conversion factor
-        if (getNumber(0,1) == 0) {
-            problem = 'Given 1 pound = 16 ounces<br /><br />';
-        }
-        else {
-            problem = 'Given 16 ounces = 1 pound<br /><br />';
-        }
-        
-        var i = getNumber(0,1); // external js
-        
-        if (i == 0) { // start with ounces
-            displayNum = getNumber(1, 620)/10;
-            
-            // use whole numbers most of the time
-            if ((displayNum >= 1) && (getNumber(0,3) < 3)) {
-                displayNum = Math.floor(displayNum);
-            }
-        
-            problem += 'Convert ' + displayNum + ' pounds to ounces';
-            
-            answer = (displayNum * 16); // convert feet to inches
-            answer = roundDecimalNumber(answer, 1); // round to one decimal place
-        }
-        else { // start with ounces
-            displayNum = getNumber(1, 200); // get a random number between 1 and 200
-            
-            // use decimals occasionally
-            if (getNumber(0,3) < 1) {
-                displayNum += getNumber(1, 9)/10;
-            }
-            
-            problem += 'Convert ' + displayNum + ' ounces to pounds';
-            
-            answer = (displayNum / 16); // convert ounces to pounds
-            answer = roundDecimalNumber(answer, 1); // round to one decimal place
-        }
-        // display problem
+    // create an addition problem
+    function additionProblem() {
+        var problem = firstNum + ' + ' + secondNum + ' = ?';
         document.getElementById('problemSpace').innerHTML = problem;
+        answer = firstNum + secondNum;
     }
- 
+    
+    // create a subtraction problem
+    function subtractionProblem() {
+        var problem = firstNum + ' - ' + secondNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = firstNum - secondNum;
+    }
+    
+    // create a multiplication problem
+    function multiplicationProblem() {
+        var problem = firstNum + ' &bull; ' + secondNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = firstNum * secondNum;
+    }
+    
+    // create a division problem
+    function divisionProblem() {
+        // make sure it's not zero divided by zero
+        while (firstNum == 0) { // if the first number is zero
+            generateNumbers(); // get new numbers
+        }
+        // use the thirdNum variable to make sure our division will work out to an integer
+        var thirdNum = firstNum * secondNum;
+        var problem = thirdNum + ' &divide; ' + firstNum + ' = ?';
+        document.getElementById('problemSpace').innerHTML = problem;
+        answer = secondNum;
+    }
+    
     // check the answer and give feedback
     function checkAnswer() {
-        var pointZero = false; // true if answer rounds to "point zero"
-        
-        if (document.forms[0].userAnswer.value == Math.floor(answer) && 10*answer%10 == 0) {
-            pointZero = true;
-        }
-        
         // make sure user inputs an answer
         if (document.forms[0].userAnswer.value == '') { // input is blank
             document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
@@ -222,9 +145,8 @@ span {
         
         // display user's answer               
         document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
-        
-        // give appropriate feedback        
-        if (document.forms[0].userAnswer.value == answer || pointZero == true) { // answer is correct
+        // give appropriate feedback
+        if (document.forms[0].userAnswer.value == answer) { // answer is correct
             // track stats
             if (submissions == 1) {
                 numCorrect++;
@@ -240,22 +162,29 @@ span {
             if (document.forms[0].playVideo.checked == true) {
                 playWrongAnswer();
             }
-            
+    
             document.getElementById('feedback').innerHTML = 'Not quite.';
             
             if (running == true) { // timer is running
                 // show correct answer so user doesn't need to click "Show Answer" button
                 document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+                
+                // keep track of incorrect answers
+                if (submissions == 1) {
+                    wrongAnswers[numWrong] = document.getElementById('problemSpace').innerHTML;
+                    userAnswers[numWrong] = document.forms[0].userAnswer.value;
+                    correctAnswers[numWrong] = answer;
+                    numWrong++;
+                }
             }
-
-            document.forms[0].newProblem.focus();            
+            document.forms[0].newProblem.focus();
         }
         
         incrementAttempts();
         calculateStats();
         
         return false;
-    }
+    } // end of checkAnswer()
     
     // if this is the first attempt at a problem, we need to increment the total of attempts
     function incrementAttempts() {
@@ -266,7 +195,19 @@ span {
     
     // allow numberpad to type in answer
     function updateString(value) {
-        document.forms[0].userAnswer.value += value;
+        inputString += value;
+        document.forms[0].userAnswer.value = inputString;
+    }
+
+    // +/- button for negative answers
+    function switchSign(value) {
+        if (inputString == '') {
+            updateString('-');
+        }
+        else {
+            inputString *= -1;
+            document.forms[0].userAnswer.value = inputString;
+        }
     }
     
     // clear button to reset the form
@@ -284,10 +225,10 @@ span {
         incrementAttempts();
         calculateStats();
     }
+    
     // set or reset the video frame to blank
     function resetVideoFrame() {
-        document.getElementById('videoSpace').innerHTML =
-                '<video width="240" height="132"></video>';
+        document.getElementById('videoSpace').innerHTML = '<video width="240" height="132"></video>';
     }
     
     // reset the statistics
@@ -336,7 +277,7 @@ span {
         else if (i == 'fiveMin') {
             time = 300;
         }
-        
+
         resetStats(); // reset stats and get a new problem
         
         running = true;
@@ -344,7 +285,7 @@ span {
         count = time - 1; // set the time in seconds
         
         counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
-        
+
         document.getElementById('timerPrompt').innerHTML = 'Time:'; 
         
         document.getElementById('timer').style.display = 'inline'; // display the time remaining
@@ -356,15 +297,28 @@ span {
         document.getElementById('hideStatsBtn').disabled = true;
         document.getElementById('resetBtn').disabled = true;
         document.getElementById('showStatsBtn').disabled = true;
-        document.getElementById('factsOnly').disabled = true;
         document.getElementById('playVideo').disabled = true;
         document.getElementById('playVideo').checked = false;
         
-        document.getElementById('numAddendsSelect').disabled = true;
-        document.getElementById('firstDigitsSelect').disabled = true;
-        document.getElementById('secondDigitsSelect').disabled = true;
-        document.getElementById('thirdDigitsSelect').disabled = true;
-    }
+        document.getElementById('addition').disabled = true;
+        document.getElementById('subtraction').disabled = true;
+        document.getElementById('multiplication').disabled = true;
+        document.getElementById('division').disabled = true;
+        document.getElementById('allOpsBtn').disabled = true;
+        document.getElementById('clearOpsBtn').disabled = true;
+        document.getElementById('allDigitsBtn').disabled = true;
+        document.getElementById('clearDigitsBtn').disabled = true;
+        document.forms[0].digitZero.disabled = true;
+        document.forms[0].digitOne.disabled = true;
+        document.forms[0].digitTwo.disabled = true;
+        document.forms[0].digitThree.disabled = true;
+        document.forms[0].digitFour.disabled = true;
+        document.forms[0].digitFive.disabled = true;
+        document.forms[0].digitSix.disabled = true;
+        document.forms[0].digitSeven.disabled = true;
+        document.forms[0].digitEight.disabled = true;
+        document.forms[0].digitNine.disabled = true;
+    } // end of startTimer()
     
     // more running of the timer
     function timer() {
@@ -373,8 +327,7 @@ span {
         count = count - 1;
         if (count < 0) { // when time is up...           
             window.alert('Time\'s up!'); // display a message
-
-            // display a message with stats
+            
             var pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
             var i;
             
@@ -386,7 +339,17 @@ span {
             }
             window.alert('Time: ' + i +
                          '\nNumber correct: ' + numCorrect + 
-                         '\nPercent correct: ' + pctCorrect + '%');           
+                         '\nPercent correct: ' + pctCorrect + '%');
+            
+            var displayWrong = ''; // generate a string literal to display all wrong answers
+            for (j=0; j<numWrong; j++) {
+                displayWrong = displayWrong + '\n\n' + wrongAnswers[j] +
+                    '\nYour answer: ' + userAnswers[j] +
+                    '\nCorrect answer: ' + correctAnswers[j];
+            }
+            
+            window.alert('Problems to practice... ' + displayWrong);
+           
             stopTimer();
             
             return;
@@ -395,11 +358,14 @@ span {
     
     // stop the timer
     function stopTimer() {
+        numWrong = 0; // this will ultimately reset the displayWrong string
+        
         clearInterval(counter); // stop the timer
         running = false;
+        
 
         document.getElementById('timerPrompt').innerHTML = 'Set the timer';
-        
+
         document.getElementById('startBtn').style.display = 'inline'; // show the start button
         document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
         document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
@@ -409,14 +375,27 @@ span {
         document.getElementById('hideStatsBtn').disabled = false;
         document.getElementById('resetBtn').disabled = false;
         document.getElementById('showStatsBtn').disabled = false;
-        document.getElementById('factsOnly').disabled = false;
         document.getElementById('playVideo').disabled = false;
         
-        document.getElementById('numAddendsSelect').disabled = false;
-        document.getElementById('firstDigitsSelect').disabled = false;
-        document.getElementById('secondDigitsSelect').disabled = false;
-        document.getElementById('thirdDigitsSelect').disabled = false;
-    }
+        document.getElementById('addition').disabled = false;
+        document.getElementById('subtraction').disabled = false;
+        document.getElementById('multiplication').disabled = false;
+        document.getElementById('division').disabled = false;
+        document.getElementById('allOpsBtn').disabled = false;
+        document.getElementById('clearOpsBtn').disabled = false;
+        document.getElementById('allDigitsBtn').disabled = false;
+        document.getElementById('clearDigitsBtn').disabled = false;
+        document.forms[0].digitZero.disabled = false;
+        document.forms[0].digitOne.disabled = false;
+        document.forms[0].digitTwo.disabled = false;
+        document.forms[0].digitThree.disabled = false;
+        document.forms[0].digitFour.disabled = false;
+        document.forms[0].digitFive.disabled = false;
+        document.forms[0].digitSix.disabled = false;
+        document.forms[0].digitSeven.disabled = false;
+        document.forms[0].digitEight.disabled = false;
+        document.forms[0].digitNine.disabled = false;
+    } // end of stopTimer()
     
     // change the autofocus to support mobile and tablet devices
     function changeToMobile() {
@@ -433,7 +412,7 @@ span {
     // call necessary functions when page loads
     function loadPage() {
         if (running == false) {
-            document.getElementById('timer').innerHTML = time + ' seconds<br />';
+                document.getElementById('timer').innerHTML = time + ' seconds<br />';
         }
         
         if (device == 'desktop') {
@@ -453,13 +432,13 @@ span {
         }
 
         clearAnswer();
-        selectType();
+        generateNumbers();
         document.getElementById('repeatAnswer').innerHTML = '';
         document.getElementById('feedback').innerHTML = '';
         document.getElementById('answer').innerHTML = '';
         resetVideoFrame();
-    } // end of loadPage()
-    
+        
+    }
     // video feedback for correct answers
     function playCorrectAnswer() {
         var numVideos = 2;
@@ -484,7 +463,6 @@ span {
                 document.alert("There was an error playing the video feedback");
         }
     }
-    
     // video feedback for wrong answers
     function playWrongAnswer() {
         var numVideos = 2;
@@ -522,7 +500,7 @@ span {
 <script src='../../external javascript files/welcome_options.js'></script>
 </head>
 
-<body onload='welcome(); loadPage();'>
+<body onload='welcome(); return loadPage();'>
 
 <div id="header">
 <script src='../../external javascript files/header.js'></script>
@@ -533,7 +511,7 @@ span {
 </div>
 
 <div id="section">
-<h2>Unit Conversions</h2>
+<h2>Flash Cards - Operations with Integers</h2>
 <form action=''>
     <div id='version'>
         <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
@@ -541,36 +519,35 @@ span {
     
     <table>
     <tr>
-    <td style='border:solid; width:45%; min-width:290px; padding:5px;'>
-        <span id='prompt'></span>
+    <td style='border:solid; width:30%; min-width:190px; padding:5px;'>
+        <span id='prompt'>Perform the operation:</span>
         <br /><br />
         &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
         <br /><br />
         
         <!-- input box for user's answer -->
-        Round to one decimal place (tenths)<br />
-        Answer:<input type='text' name='userAnswer' size='6' />
+        Answer:<input type='text' name='userAnswer' size='4' />
         <br /><br />
         
         <!-- keypad -->
-        <input type='button' name='seven' style='width: 60px; height:30px;' value='7' onclick='updateString("7");' />
-        <input type='button' name='eight' style='width: 60px; height:30px;' value='8' onclick='updateString("8");' />
-        <input type='button' name='nine' style='width: 60px; height:30px;' value='9' onclick='updateString("9");' />
+        <input type='button' name='seven' style='width:60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width:60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width:60px; height:30px;' value='9' onclick='updateString("9");' />
         <br />
-        <input type='button' name='four' style='width: 60px; height:30px;' value='4' onclick='updateString("4");' />
-        <input type='button' name='five' style='width: 60px; height:30px;' value='5' onclick='updateString("5");' />
-        <input type='button' name='six' style='width: 60px; height:30px;' value='6' onclick='updateString("6");' />
+        <input type='button' name='four' style='width:60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width:60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width:60px; height:30px;' value='6' onclick='updateString("6");' />
         <br />
-        <input type='button' name='one' style='width: 60px; height:30px;' value='1' onclick='updateString("1");' />
-        <input type='button' name='two' style='width: 60px; height:30px;' value='2' onclick='updateString("2");' />
-        <input type='button' name='three' style='width: 60px; height:30px;' value='3' onclick='updateString("3");' />
+        <input type='button' name='one' style='width:60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width:60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width:60px; height:30px;' value='3' onclick='updateString("3");' />
         <br />
-        <input type='button' name='zero' style='width: 60px; height:30px;' value='0' onclick='updateString("0");' />
-        <input type='button' name='point' style='width: 60px; height:30px;' value='.' onclick='updateString(".");' />
-        <input type='button' name='clear' style='width: 60px; height:30px;' value='Clear' onclick='clearAnswer();' />                    
+        <input type='button' name='zero' style='width:60px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='point' style='width:60px; height:30px;' value='+/-' onclick='switchSign("-");' />
+        <input type='button' name='clear' style='width:60px; height:30px;' value='Clear' onclick='clearAnswer();' />
         <br />
         <br />
-        <input type='submit' value='Check my answer' style='width:120px; height:30px;' onclick=' return checkAnswer();' />
+        <input type='submit' value='Check my answer' style='width: 158px; height:30px;' onclick=' return checkAnswer();' />
         <br />
         
         <span id='repeatAnswer'><br /></span>
@@ -596,7 +573,7 @@ span {
         <span id='closingMessage'>&nbsp;</span>
     </td>
     
-    <td style='margin-left:15px; border:none; text-align:right;'>
+    <td style='margin-left:15px; width:30%; border:none; text-align:right; vertical-align:top;'>
         <!-- timer -->
         <div>
             <span id='timerPrompt'>Set the timer</span>
@@ -610,6 +587,7 @@ span {
         <input type='button' id='startBtn' value='Start' style='height:30px;' onclick='startTimer();' />
         <input type='button' id='stopBtn' value='Stop' style='height:30px; display:none;' onclick='stopTimer();' />
         <br /><br />
+
         
         <!-- stats -->
         <div id='stats'>
@@ -623,14 +601,22 @@ span {
         <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
         <br /><br />
         
-        <!-- options -->
-        <div>
-            <span style='text-decoration:underline;'>Convert between...</span><br />
-            Feet & Inches<input type='checkbox' name='type1' checked='checked' /><br />
-            Minutes & Seconds<input type='checkbox' name='type2' checked='checked' /><br />
-            Pounds & Ounces<input type='checkbox' name='type3' checked='checked' />
-        </div>
-        <br />
+        <!-- choose operations -->
+        <span>
+            Operation(s) to practice<br />
+            Add<input type='checkbox' name='addition' id='addition' checked='checked' />
+            <br />
+            Subtract<input type='checkbox' name='subtraction' id='subtraction' checked='checked' />
+            <br />
+            Multiply<input type='checkbox' name='multiplication' id='multiplication' checked='checked' />
+            <br />
+            Divide<input type='checkbox' name='division' id='division' checked='checked' />
+            <br />
+            <script src='../../external javascript files/selectDigits.js'></script>
+            <input type='button' value='Select all' id='allOpsBtn' style='height:30px;' onclick='selectAllOperations();' />
+            <input type='button' value='Clear all' id='clearOpsBtn' style='height:30px;' onclick='clearAllOperations();' />
+        </span>
+        <br /><br />
         <!-- button to generate a new problem -->
         <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
         <br /><br />
@@ -642,16 +628,6 @@ span {
         <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
         
     </td>
- <!--   Buttons for self-paced exercises
-    <td style='margin-left:25px; border:none; text-align:right;'>
-        Do a self-paced exercise
-        <br />
-        <input type='button' value='Facts practice' onclick='' /><br />
-        <input type='button' value='Practice #1' onclick='' /><br />
-        <input type='button' value='Practice #2' onclicked='' /><br />
-        <input type='button' value='Practice #3' onclick='' />
-    </td>
--->
     </tr>
     </table>
 </form>
