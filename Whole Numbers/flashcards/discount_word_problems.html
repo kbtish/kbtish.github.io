@@ -1,0 +1,702 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Flashcards - Discount Word Problems</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel='stylesheet' type='text/css' href='../whole_numbers_template.css' />
+<style type='text/css'>
+span {
+    background-color: inherit;
+    font-weight: bold;
+}
+</style>
+
+<!-- external js -->
+<script src='../../external javascript files/random_number_generator.js'></script>
+<script src='../../external javascript files/round numbers.js'></script>
+
+<script type="text/javascript">
+    /* <![CDATA[ */
+    
+    // global variables
+    var inputString; // holds the value input by the user
+    var answer; // holds the answer
+    var numAttempts = 0; // number of attempted problems
+    var numCorrect = 0; // number of correctly answered questions
+    var pctCorrect; 
+    var submissions; // keep track of how many times an answer is submitted for a given problem
+    var time; // seconds on the timer
+    var count; // will hold the number of seconds
+    var counter; // object/function to act as a timer
+    var running = false; // tells whether or not the timer is running
+    var device = 'desktop'; // can be changed to mobile; difference is in autofocus
+    var missingPercent; // if the answer is a percent, this variable will hold the answer without a % symbol
+    var problem;
+    
+    // variables specific to these flashcards
+    var item; // the item being purchased
+    var regPrice; // regular price of the item
+    var salePrice; // the sale price of the item
+    var discount; // given as a percentage
+    var savings; // how much is saved
+    var quantity; // singular item, or plural items; a vs. some, it vs. they, etc.
+    var selection = new Array();    
+    var questionType; // which of the four types of question to ask
+    
+    function selectType() {
+ // how many options are selected?
+        var i = 0;
+        
+        if (document.getElementById('savingsAmount').checked) {
+            selection[i] = 'savingsAmount';
+            i += 1;
+            
+        }
+        if (document.getElementById('savingsPercent').checked) {
+            selection[i] = 'savingsPercent';
+            i += 1;
+        }
+        if (document.getElementById('regularPrice').checked) {
+            selection[i] = 'regularPrice';
+            i += 1;
+        }
+        if (document.getElementById('salePrice').checked) {
+            selection[i] = 'salePrice';
+            i += 1;
+        }
+        
+        if (i == 0) {
+            window.alert('Please select at least one type of question.');
+            return;
+        }
+        else {
+            var j = getNumber(0, i-1); // external js
+            
+            if (selection[j] == 'savingsAmount') {
+                questionType = selection[j];
+            }
+            else if (selection[j] == 'savingsPercent') {
+                questionType = selection[j];
+            }
+            else if (selection[j] == 'regularPrice') {
+                questionType = selection[j];
+            }
+            else if (selection[j] == 'salePrice') {
+                questionType = selection[j];
+            }
+        }
+        
+        getItem();
+        
+        getQuestion();
+    } // end of function selectType()
+    
+    function getItem() {
+        var i = getNumber(0,3);
+        
+        switch (i) {
+            case 0:
+                item = 'A shirt';
+                quantity = 'single';
+                break;
+            case 1:
+                item = 'Shoes';
+                quantity = 'plural';
+                break;
+            case 2:
+                item = 'A jacket';
+                quantity = 'single';
+                break;
+            case 3:
+                item = 'Pants';
+                quantity = 'plural';
+                break;
+            default:
+                alert('Oops!  Something went wrong.  Please refresh the page.');
+        }
+    } // end of getItem()
+    
+    function getQuestion() {
+        // generate numbers
+        regPrice = getNumber(500, 10000)/100;
+        discount = getNumber(1,95);
+        savings = discount/100 * regPrice;
+        savings = roundDecimalNumber(savings, 2); // external js; round to 2 places
+        salePrice = regPrice - savings;
+        salePrice = roundDecimalNumber(salePrice, 2); // external js; round to 2 places
+
+        // display prices with two decimal places, if any
+        var i = regPrice*100;
+        if (i%10 == 0) {
+            regPrice += '0';
+        }
+        var j = salePrice*100;
+        if (j%10 == 0) {
+            salePrice += '0';
+        }
+        
+        if (questionType == 'savingsAmount') {
+            if (quantity == 'single') {
+                problem = item + ' regularly costs $' + regPrice +'.' +
+                    '<br />You buy it on sale for ' + discount + '% off.' +
+                    '<br /><br />' +
+                    'How much money do you save?';
+            }
+            else if (quantity == 'plural') {
+                problem = item + ' regularly cost $' + regPrice +'.' +
+                    '<br />You buy them on sale for ' + discount + '% off.' +
+                    '<br /><br />' +
+                    'How much money do you save?';                
+            }
+            else {
+                alert('Something went wrong.  Please refresh the page.');
+            }
+            
+            answer = savings;
+        }
+        
+        else if (questionType == 'savingsPercent') {
+            if (quantity == 'single') {
+                problem = item + ' regularly costs $' + regPrice + '.' +
+                    '<br />You buy it for $' + salePrice + '.' +
+                    '<br /><br />' +
+                    'What percent do you save?';
+            }
+            else if (quantity == 'plural') {
+                problem = item + ' regularly cost $' + regPrice + '.' +
+                    '<br />You buy them for $' + salePrice + '.' +
+                    '<br /><br />' +
+                    'What percent do you save?';
+            }
+            else {
+                alert('Something went wrong.  Please refresh the page.');
+            }
+            
+            missingPercent = discount;
+            answer = discount + '%';
+        }
+        
+        else if (questionType == 'regularPrice') {
+            if (quantity == 'single') {
+                problem = item + ' is on sale for ' + discount + '% off.' +
+                    '<br />You buy it for $' + salePrice + '.' +
+                    '<br /><br />' +
+                    'What is the regular price?';
+            }
+            else if (quantity == 'plural') {
+                 problem = item + ' are on sale for ' + discount + '% off.' +
+                    '<br />You buy them for $' + salePrice + '.' +
+                    '<br /><br />' +
+                    'What is the regular price?';               
+            }
+            else {
+                alert('Something went wrong.  Please refresh the page.');
+            }
+            
+            answer = regPrice;
+        }
+        
+        else if (questionType == 'salePrice') {
+            if (quantity == 'single') {
+                problem = item + ' regularly costs $' + regPrice +'.' +
+                    '<br />You buy it on sale for ' + discount + '% off.' +
+                    '<br /><br />' +
+                    'How much money do you pay?';
+            }
+            else if (quantity == 'plural') {
+                problem = item + ' regularly cost $' + regPrice +'.' +
+                    '<br />You buy them on sale for ' + discount + '% off.' +
+                    '<br /><br />' +
+                    'How much money do you pay?';                
+            }
+            else {
+                alert('Something went wrong.  Please refresh the page.');
+            }
+            
+            answer = salePrice;
+        }
+        else {
+            alert('Something went wrong.  Please refresh the page.');
+        }
+        
+        // display the problem
+        document.getElementById('problemSpace').innerHTML = problem;
+        
+    } // end of getQuestion()
+ 
+    // check the answer and give feedback
+    function checkAnswer() {
+        // make sure user inputs an answer
+        if (document.forms[0].userAnswer.value == '') { // input is blank
+            document.getElementById('repeatAnswer').innerHTML = 'Type an answer in the box above.';
+            document.getElementById('feedback').innerHTML = '<br />';
+            return false;
+        }
+        
+        submissions++; // increment the number of submitted answers for the given problem
+        
+        // display user's answer               
+        document.getElementById('repeatAnswer').innerHTML = 'Your answer: ' + document.forms[0].userAnswer.value;
+        
+        // give appropriate feedback        
+        if (document.forms[0].userAnswer.value == answer) { // answer is correct
+            // track stats
+            if (submissions == 1) {
+                numCorrect++;
+            }
+            
+            if (document.forms[0].playVideo.checked == true) {
+                playCorrectAnswer();
+            }
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            document.forms[0].newProblem.focus();
+        }
+        else if ((questionType == 'savingsPercent') && (document.forms[0].userAnswer.value==missingPercent)) {
+            // user forgot to include the % symbol
+            if (document.forms[0].playVideo.checked == true) {
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="partialCredit" width="240" height="132">' +
+                        '<source src="../../files/partial credit.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(partialCredit);
+            }
+            
+            submissions--; // don't count this against the user
+            document.getElementById('feedback').innerHTML = 'Don\'t forget the %.';
+            document.forms[0].percent.focus();            
+        }
+        else { // answer is incorrect
+            if (document.forms[0].playVideo.checked == true) {
+                playWrongAnswer();
+            }
+            
+            document.getElementById('feedback').innerHTML = 'Not quite.';
+            
+            if (running == true) { // timer is running
+                // show correct answer so user doesn't need to click "Show Answer" button
+                document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+            }
+
+            document.forms[0].newProblem.focus();            
+        }
+        
+        incrementAttempts();
+        calculateStats();
+        
+        return false;
+    }
+    
+    // if this is the first attempt at a problem, we need to increment the total of attempts
+    function incrementAttempts() {
+        if (submissions == 1) {
+            numAttempts++;
+        }
+    }
+    
+    // allow numberpad to type in answer
+    function updateString(value) {
+        document.forms[0].userAnswer.value += value;
+    }
+    
+    // clear button to reset the form
+    function clearAnswer() {
+        document.forms[0].userAnswer.value = "";
+        inputString = "";
+    }
+    
+    // show the correct answer
+    function showAnswer() {
+        document.getElementById('answer').innerHTML = 'Answer: ' + answer;
+        
+        // if no answer has been submitted, this will count as a wrong answer
+        submissions++;
+        incrementAttempts();
+        calculateStats();
+    }
+    // set or reset the video frame to blank
+    function resetVideoFrame() {
+        document.getElementById('videoSpace').innerHTML =
+                '<video width="240" height="132"></video>';
+    }
+    
+    // reset the statistics
+    function resetStats() {
+        numAttempts = 0;
+        numCorrect = 0;
+        
+        document.getElementById('attempted').innerHTML = '';
+        document.getElementById('correct').innerHTML = '';
+        document.getElementById('percent').innerHTML = '';
+        
+        loadPage();
+    }
+    
+    // hide the statistics
+    function hideStats() {
+        document.getElementById('stats').style.visibility = 'hidden';
+        document.getElementById('resetBtn').style.visibility = 'hidden';
+        document.getElementById('hideStatsBtn').style.visibility = 'hidden';
+        document.getElementById('showStatsBtn').style.display = 'inline';
+    }
+    
+    // show the statistics
+    function showStats() {
+        document.getElementById('stats').style.visibility = 'visible';
+        document.getElementById('resetBtn').style.visibility = 'visible';
+        document.getElementById('hideStatsBtn').style.visibility = 'visible';
+        document.getElementById('showStatsBtn').style.display = 'none';
+    }
+    
+    // calculate and update the statistics
+    function calculateStats() {
+        pctCorrect = (100*numCorrect/numAttempts).toFixed(0);
+        document.getElementById('attempted').innerHTML = numAttempts;
+        document.getElementById('correct').innerHTML = numCorrect;
+        document.getElementById('percent').innerHTML = pctCorrect + '%';        
+    }
+    
+    // run the timer; see also timer() function
+    function startTimer() {
+        var i = document.forms[0].timeLimit.value;
+        
+        if (i == 'oneMin') {
+            time = 60;
+        }
+        else if (i == 'fiveMin') {
+            time = 300;
+        }
+        
+        resetStats(); // reset stats and get a new problem
+        
+        running = true;
+        
+        count = time - 1; // set the time in seconds
+        
+        counter = setInterval(timer, 1000); //1000 will  run it every 1 second  
+        
+        document.getElementById('timerPrompt').innerHTML = 'Time:'; 
+        
+        document.getElementById('timer').style.display = 'inline'; // display the time remaining
+        document.getElementById('startBtn').style.display = 'none'; // hide the Start button
+        document.getElementById('stopBtn').style.display = 'inline'; // show the stop button
+        document.getElementById('timeLimit').style.display = 'none'; // hide the selection list
+        
+        // disable options
+        document.getElementById('hideStatsBtn').disabled = true;
+        document.getElementById('resetBtn').disabled = true;
+        document.getElementById('showStatsBtn').disabled = true;
+        document.getElementById('factsOnly').disabled = true;
+        document.getElementById('playVideo').disabled = true;
+        document.getElementById('playVideo').checked = false;
+        
+        document.getElementById('numAddendsSelect').disabled = true;
+        document.getElementById('firstDigitsSelect').disabled = true;
+        document.getElementById('secondDigitsSelect').disabled = true;
+        document.getElementById('thirdDigitsSelect').disabled = true;
+    }
+    
+    // more running of the timer
+    function timer() {
+        document.getElementById("timer").innerHTML = count + " seconds<br />";
+        
+        count = count - 1;
+        if (count < 0) { // when time is up...           
+            window.alert('Time\'s up!'); // display a message
+
+            // display a message with stats
+            var i;
+            
+            if (time == 60) {
+                i = '1 minute';
+            }
+            else {
+                i = '5 minutes';
+            }
+            window.alert('Time: ' + i +
+                         '\nNumber correct: ' + numCorrect + 
+                         '\nPercent correct: ' + pctCorrect + '%');           
+            stopTimer();
+            
+            return;
+        }
+    } // end of timer()
+    
+    // stop the timer
+    function stopTimer() {
+        clearInterval(counter); // stop the timer
+        running = false;
+
+        document.getElementById('timerPrompt').innerHTML = 'Set the timer';
+        
+        document.getElementById('startBtn').style.display = 'inline'; // show the start button
+        document.getElementById('stopBtn').style.display = 'none'; // hide the stop button
+        document.getElementById('timeLimit').style.display = 'inline'; // show the selection list
+        document.getElementById('timer').style.display = 'none'; // hide the time remaining
+        
+        // enable options
+        document.getElementById('hideStatsBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        document.getElementById('showStatsBtn').disabled = false;
+        document.getElementById('factsOnly').disabled = false;
+        document.getElementById('playVideo').disabled = false;
+        
+        document.getElementById('numAddendsSelect').disabled = false;
+        document.getElementById('firstDigitsSelect').disabled = false;
+        document.getElementById('secondDigitsSelect').disabled = false;
+        document.getElementById('thirdDigitsSelect').disabled = false;
+    }
+    
+    // change the autofocus to support mobile and tablet devices
+    function changeToMobile() {
+        device = 'mobile';
+        loadPage();
+    }
+    
+    // change the autofocus to support desktop devices
+    function changeToDesktop() {
+        device = 'desktop';
+        loadPage();
+    }
+    
+    // call necessary functions when page loads
+    function loadPage() {
+        submissions = 0;
+        
+        if (running == false) {
+            document.getElementById('timer').innerHTML = time + ' seconds<br />';
+        }
+        
+        if (device == 'desktop') {
+            // autofocus on the input box
+            document.forms[0].userAnswer.focus();
+            
+            // change the display
+            document.getElementById('version').innerHTML =
+                'You are using the desktop version.' +
+                '<br /><input type="button" value="Change to mobile/tablet" onclick="changeToMobile();" />';
+        }
+        else {            
+            // change the display
+            document.getElementById('version').innerHTML =
+                'You are using the mobile/tablet version.' +
+                '<br /><input type="button" value="Change to desktop" onclick="changeToDesktop();" />';
+        }
+
+        clearAnswer();
+        selectType();
+        document.getElementById('repeatAnswer').innerHTML = '';
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('answer').innerHTML = '';
+        resetVideoFrame();
+    } // end of loadPage()
+    
+    // video feedback for correct answers
+    function playCorrectAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="reallyGoodAtMath" width="240" height="132">' +
+                        '<source src="../../files/really good at math.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(reallyGoodAtMath);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="smrt" width="240" height="132">' +
+                        '<source src="../../files/smrt.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(smrt);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // video feedback for wrong answers
+    function playWrongAnswer() {
+        var numVideos = 2;
+        var i = Math.floor(Math.random()*numVideos + 1);
+        
+        switch (i) {
+            case 1:
+                document.getElementById('videoSpace').innerHTML =
+                        '<video id="what" width="240" height="132">' +
+                            '<source src="../../files/what.mp4" type="video/mp4"></source>' +
+                        '</video>';
+                playVideo(what);
+                break;
+            case 2:
+                document.getElementById('videoSpace').innerHTML =
+                    '<video id="notEvenClose" width="240" height="132">' +
+                        '<source src="../../files/not even close.mp4" type="video/mp4"></source>' +
+                    '</video>';
+                playVideo(notEvenClose);
+                break;
+            default:
+                document.alert("There was an error playing the video feedback");
+        }
+    }
+    
+    // play whichever video is called
+    function playVideo(video) {
+        video.play();
+        video.onended = function() { // when the video ends
+            resetVideoFrame();    
+        }
+    }
+    /* ]]> */
+</script>
+<script src='../../external javascript files/welcome_options.js'></script>
+</head>
+
+<body onload='welcome(); loadPage();'>
+
+<div id="header">
+<script src='../../external javascript files/header.js'></script>
+</div>
+
+<div id="nav">
+<script src='../../external javascript files/nav.js'></script>
+</div>
+
+<div id="section">
+<h2>Discount Word Problems</h2>
+<form action=''>
+    <div id='version'>
+        <!-- this section will identify the type of device (mobile/desktop) and give a button to change -->
+    </div>
+    
+    <table>
+    <tr>
+    <td style='border:solid; width:45%; min-width:190px; padding:5px;'>
+        <span id='prompt'></span>
+        <br /><br />
+        &nbsp;&nbsp;&nbsp;<span style='font-size:125%;' id='problemSpace'>&nbsp;</span>
+        <br /><br />
+        
+        <!-- input box for user's answer -->
+        Answer:<input type='text' name='userAnswer' size='6' />
+        <br /><br />
+        
+        <!-- keypad -->
+        <input type='button' name='seven' style='width: 60px; height:30px;' value='7' onclick='updateString("7");' />
+        <input type='button' name='eight' style='width: 60px; height:30px;' value='8' onclick='updateString("8");' />
+        <input type='button' name='nine' style='width: 60px; height:30px;' value='9' onclick='updateString("9");' />
+        <br />
+        <input type='button' name='four' style='width: 60px; height:30px;' value='4' onclick='updateString("4");' />
+        <input type='button' name='five' style='width: 60px; height:30px;' value='5' onclick='updateString("5");' />
+        <input type='button' name='six' style='width: 60px; height:30px;' value='6' onclick='updateString("6");' />
+        <br />
+        <input type='button' name='one' style='width: 60px; height:30px;' value='1' onclick='updateString("1");' />
+        <input type='button' name='two' style='width: 60px; height:30px;' value='2' onclick='updateString("2");' />
+        <input type='button' name='three' style='width: 60px; height:30px;' value='3' onclick='updateString("3");' />
+        <br />
+        <input type='button' name='zero' style='width: 60px; height:30px;' value='0' onclick='updateString("0");' />
+        <input type='button' name='point' style='width: 60px; height:30px;' value='.' onclick='updateString(".");' />
+        <input type='button' name='percent' style='width: 60px; height:30px;' value='%' onclick='updateString("%");' />                    
+        <br />
+        <br />
+        <input type='submit' value='Check my answer' style='width:120px; height:30px;' onclick=' return checkAnswer();' />
+        <input type='button' name='clear' style='width: 60px; height:30px;' value='Clear' onclick='clearAnswer();' />
+        <br />
+        
+        <span id='repeatAnswer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='feedback'><br /></span>
+        &nbsp;
+        <br />
+        
+        <!-- button to generate a new problem -->
+        <input type='button' name='newProblem' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br />
+        
+        <!-- button to show correct answer -->
+        <input type='button' value='Show answer' style='height:30px;' onclick='showAnswer();' />
+        <br />
+        
+        <span id='answer'><br /></span>
+        &nbsp;
+        <br />
+        
+        <span id='closingMessage'>&nbsp;</span>
+    </td>
+    
+    <td style='margin-left:15px; border:none; text-align:right;'>
+        <!-- timer -->
+        <div>
+            <span id='timerPrompt'>Set the timer</span>
+            <br />
+            <select name='timeLimit' id='timeLimit'>
+                <option value='oneMin'>1 minute</option>
+                <option value='fiveMin'>5 minutes</option>
+            </select>
+        </div>
+        <div id='timer' style='display:none;'></div>
+        <input type='button' id='startBtn' value='Start' style='height:30px;' onclick='startTimer();' />
+        <input type='button' id='stopBtn' value='Stop' style='height:30px; display:none;' onclick='stopTimer();' />
+        <br /><br />
+        
+        <!-- stats -->
+        <div id='stats'>
+            <span style='text-decoration:underline;'>Statistics</span><br />
+            Problems attempted: <span id='attempted'>&nbsp;</span><br />
+            Number correct: <span id='correct'>&nbsp;</span><br />
+            Percent correct: <span id='percent'>&nbsp;</span><br />
+        </div>
+        <input type='button' id='hideStatsBtn' value='Hide' style='height:30px;' onclick='hideStats();' />
+        <input type='button' id='resetBtn' value='Reset' style='height:30px;' onclick='resetStats()' />
+        <input type='button' id='showStatsBtn' value='Show statistics' style='display:none; height:30px;' onclick='showStats();' />
+        <br /><br />
+        
+        <!-- options -->
+        <div>
+            <span style='text-decoration:underline;'>Type(s) of question</span><br />
+            Find the savings amount<input type='checkbox' id='savingsAmount' checked />
+            <br />
+            Find the sales price<input type='checkbox' id='salePrice' checked />
+            <br />
+            Find the savings percent<input type='checkbox' id='savingsPercent' checked />
+            <br />
+            Find the regular price<input type='checkbox' id='regularPrice' checked />
+            <br />
+        </div>
+        <br />
+        <!-- button to generate a new problem -->
+        <input type='button' value='New problem' style='height:30px;' onclick='loadPage();' />
+        <br /><br />
+        
+        <!-- checkbox for video feedback -->
+        <input type='checkbox' name='playVideo' id='playVideo' />Play video feedback
+        <br />
+        
+        <span id='videoSpace' style='width:240px; height:132px;'>&nbsp;</span>
+        
+    </td>
+ <!--   Buttons for self-paced exercises
+    <td style='margin-left:25px; border:none; text-align:right;'>
+        Do a self-paced exercise
+        <br />
+        <input type='button' value='Facts practice' onclick='' /><br />
+        <input type='button' value='Practice #1' onclick='' /><br />
+        <input type='button' value='Practice #2' onclicked='' /><br />
+        <input type='button' value='Practice #3' onclick='' />
+    </td>
+-->
+    </tr>
+    </table>
+</form>
+
+</div>
+
+<div id="footer">
+<script src='../../external javascript files/footer.js'></script>
+</div>
+
+</body>
+</html>
