@@ -125,27 +125,29 @@ span {
         savings = roundDecimalNumber(savings, 2); // external js; round to 2 places
         salePrice = regPrice - savings;
         salePrice = roundDecimalNumber(salePrice, 2); // external js; round to 2 places
-
-        // display prices with two decimal places, if any
+        
+        // display prices with two decimal places, if any      
         var i = regPrice*100;
-        if (i%10 == 0) {
+        var j = regPrice*10;
+        if ((i%10 == 0) && (j%10 != 0)) {
             regPrice += '0';
         }
-        var j = salePrice*100;
-        if (j%10 == 0) {
+        var k = salePrice*100;
+        var m = salePrice*10
+        if ((k%10 == 0) && (m%10 != 0)) {
             salePrice += '0';
         }
         
         if (questionType == 'savingsAmount') {
             if (quantity == 'single') {
                 problem = item + ' regularly costs $' + regPrice +'.' +
-                    '<br />You buy it on sale for ' + discount + '% off.' +
+                    '<br />&nbsp;&nbsp;You buy it on sale for ' + discount + '% off.' +
                     '<br /><br />' +
                     'How much money do you save?';
             }
             else if (quantity == 'plural') {
                 problem = item + ' regularly cost $' + regPrice +'.' +
-                    '<br />You buy them on sale for ' + discount + '% off.' +
+                    '<br />&nbsp;&nbsp;You buy them on sale for ' + discount + '% off.' +
                     '<br /><br />' +
                     'How much money do you save?';                
             }
@@ -159,13 +161,13 @@ span {
         else if (questionType == 'savingsPercent') {
             if (quantity == 'single') {
                 problem = item + ' regularly costs $' + regPrice + '.' +
-                    '<br />You buy it for $' + salePrice + '.' +
+                    '<br />&nbsp;&nbsp;You buy it for $' + salePrice + '.' +
                     '<br /><br />' +
                     'What percent do you save?';
             }
             else if (quantity == 'plural') {
                 problem = item + ' regularly cost $' + regPrice + '.' +
-                    '<br />You buy them for $' + salePrice + '.' +
+                    '<br />&nbsp;&nbsp;You buy them for $' + salePrice + '.' +
                     '<br /><br />' +
                     'What percent do you save?';
             }
@@ -180,13 +182,13 @@ span {
         else if (questionType == 'regularPrice') {
             if (quantity == 'single') {
                 problem = item + ' is on sale for ' + discount + '% off.' +
-                    '<br />You buy it for $' + salePrice + '.' +
+                    '<br />&nbsp;&nbsp;You buy it for $' + salePrice + '.' +
                     '<br /><br />' +
                     'What is the regular price?';
             }
             else if (quantity == 'plural') {
-                 problem = item + ' are on sale for ' + discount + '% off.' +
-                    '<br />You buy them for $' + salePrice + '.' +
+                problem = item + ' are on sale for ' + discount + '% off.' +
+                    '<br />&nbsp;&nbsp;You buy them for $' + salePrice + '.' +
                     '<br /><br />' +
                     'What is the regular price?';               
             }
@@ -200,13 +202,13 @@ span {
         else if (questionType == 'salePrice') {
             if (quantity == 'single') {
                 problem = item + ' regularly costs $' + regPrice +'.' +
-                    '<br />You buy it on sale for ' + discount + '% off.' +
+                    '<br />&nbsp;&nbsp;You buy it on sale for ' + discount + '% off.' +
                     '<br /><br />' +
                     'How much money do you pay?';
             }
             else if (quantity == 'plural') {
                 problem = item + ' regularly cost $' + regPrice +'.' +
-                    '<br />You buy them on sale for ' + discount + '% off.' +
+                    '<br />&nbsp;&nbsp;You buy them on sale for ' + discount + '% off.' +
                     '<br /><br />' +
                     'How much money do you pay?';                
             }
