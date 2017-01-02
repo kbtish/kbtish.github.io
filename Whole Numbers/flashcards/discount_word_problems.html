@@ -118,8 +118,10 @@ span {
     } // end of getItem()
     
     // assign a random number for the regular price of the item
-    function getRegularPrice() {
+    function getRegPrice() {
         regPrice = getNumber(500, 10000)/100; // $5.00 to $100.00 (and decimals in between, like 7.49)
+        
+        regPrice = displayDecimal(regPrice);
     }
     
     // assign a random number for the discount percentage
@@ -128,34 +130,35 @@ span {
     }
     
     // assign a random number for the savings
-    /* 
     function getSavings() {
-        savings = getNumber()
+        savings = getNumber(100,9500)/100; // $1.00 to 95.00
+        
+        savings = displayDecimal(savings);
     }
-    */
     
-    function getQuestion() {
+    // assign a random number for the sale price
+    function getSalePrice() {
+        salePrice = getNumber(100,9900)/100; // $1.00 to 99.00
         
-        getRegularPrice();
-        getDiscount();
-        savings = discount/100 * regPrice;
-        savings = roundDecimalNumber(savings, 2); // external js; round to 2 places
-        salePrice = regPrice - savings;
-        salePrice = roundDecimalNumber(salePrice, 2); // external js; round to 2 places
-        
-        // display prices with two decimal places, if any      
-        var i = regPrice*100;
-        var j = regPrice*10;
+        salePrice = displayDecimal(salePrice);    
+    }
+    
+    // display prices with two decimal places, if any
+    function displayDecimal(price) {
+        var i = price*100;
+        var j = price*10;
         if ((i%10 == 0) && (j%10 != 0)) {
-            regPrice += '0';
+            price += '0';
         }
-        var k = salePrice*100;
-        var m = salePrice*10
-        if ((k%10 == 0) && (m%10 != 0)) {
-            salePrice += '0';
-        }
-        
+        return price;
+    }
+    
+    function getQuestion() {                     
         if (questionType == 'savingsAmount') {
+            // get numbers for the problem
+            getRegPrice();
+            getDiscount();
+            
             if (quantity == 'single') {
                 problem = item + ' regularly costs $' + regPrice +'.' +
                     '<br />&nbsp;&nbsp;You buy it on sale for ' + discount + '% off.' +
@@ -172,10 +175,22 @@ span {
                 alert('Something went wrong.  Please refresh the page.');
             }
             
-            answer = savings;
+            answer = discount/100 * regPrice;
+            answer = roundDecimalNumber(answer, 2); // external js; round to 2 places
+            answer = displayDecimal(answer);
         }
         
         else if (questionType == 'savingsPercent') {
+            // get numbers to display
+            getRegPrice();
+            getSalePrice();
+            
+            // make sure sale price is at least $1 less than regular price
+            while (salePrice > (regPrice - 1)) {
+                getRegPrice();
+                getSalePrice();
+            }
+            
             if (quantity == 'single') {
                 problem = item + ' regularly costs $' + regPrice + '.' +
                     '<br />&nbsp;&nbsp;You buy it for $' + salePrice + '.' +
@@ -192,11 +207,16 @@ span {
                 alert('Something went wrong.  Please refresh the page.');
             }
             
-            missingPercent = discount;
-            answer = discount + '%';
+            missingPercent = (regPrice - salePrice)/regPrice * 100;
+            missingPercent = missingPercent.toFixed(0);
+            answer = missingPercent + '%';
         }
         
         else if (questionType == 'regularPrice') {
+            // get numbers to display
+            getDiscount();
+            getSalePrice();
+            
             if (quantity == 'single') {
                 problem = item + ' is on sale for ' + discount + '% off.' +
                     '<br />&nbsp;&nbsp;You buy it for $' + salePrice + '.' +
@@ -213,10 +233,16 @@ span {
                 alert('Something went wrong.  Please refresh the page.');
             }
             
-            answer = regPrice;
+            answer = salePrice*100 / (100 - discount);
+            answer = roundDecimalNumber(answer, 2); // external js; round to 2 places
+            answer = displayDecimal(answer);
         }
         
         else if (questionType == 'salePrice') {
+            // get numbers to display
+            getRegPrice();
+            getDiscount();
+            
             if (quantity == 'single') {
                 problem = item + ' regularly costs $' + regPrice +'.' +
                     '<br />&nbsp;&nbsp;You buy it on sale for ' + discount + '% off.' +
@@ -233,7 +259,9 @@ span {
                 alert('Something went wrong.  Please refresh the page.');
             }
             
-            answer = salePrice;
+            answer = regPrice*(100-discount)/100;
+            answer = roundDecimalNumber(answer, 2); // external js; round to 2 places
+            answer = displayDecimal(answer);
         }
         else {
             alert('Something went wrong.  Please refresh the page.');
@@ -241,8 +269,28 @@ span {
         
         // display the problem
         document.getElementById('problemSpace').innerHTML = problem;
+        giveRounding();
         
     } // end of getQuestion()
+    
+    // display instructions on how to round
+    function giveRounding() {
+        if (questionType == 'savingsAmount' ||
+            questionType == 'regularPrice' ||
+            questionType == 'salePrice') {
+            // the question is asking for a dollar amount
+            
+            document.getElementById('roundingInstructions').innerHTML = 'Round final answer to hundredths place.'
+        }
+        else if (questionType == 'savingsPercent') {
+            // the question is asking for a percent
+            
+            document.getElementById('roundingInstructions').innerHTML = 'Round final answer to ones place.'
+        }
+        else {
+            window.alert('Oops.  Something went wrong.  Please refresh the page.');
+        }
+    } // end of roundInstructions
  
     // check the answer and give feedback
     function checkAnswer() {
@@ -598,6 +646,7 @@ span {
         <br /><br />
         
         <!-- input box for user's answer -->
+        <div id='roundingInstructions'></div>
         Answer:<input type='text' name='userAnswer' size='6' />
         <br /><br />
         
