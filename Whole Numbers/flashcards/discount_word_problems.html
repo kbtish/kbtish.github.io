@@ -117,10 +117,27 @@ span {
         }
     } // end of getItem()
     
-    function getQuestion() {
-        // generate numbers
-        regPrice = getNumber(500, 10000)/100;
+    // assign a random number for the regular price of the item
+    function getRegularPrice() {
+        regPrice = getNumber(500, 10000)/100; // $5.00 to $100.00 (and decimals in between, like 7.49)
+    }
+    
+    // assign a random number for the discount percentage
+    function getDiscount() {
         discount = getNumber(1,95);
+    }
+    
+    // assign a random number for the savings
+    /* 
+    function getSavings() {
+        savings = getNumber()
+    }
+    */
+    
+    function getQuestion() {
+        
+        getRegularPrice();
+        getDiscount();
         savings = discount/100 * regPrice;
         savings = roundDecimalNumber(savings, 2); // external js; round to 2 places
         salePrice = regPrice - savings;

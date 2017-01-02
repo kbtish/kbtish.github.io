@@ -14,6 +14,9 @@ function selectAllDigits() {
     document.forms[0].digitSeven.checked = true;
     document.forms[0].digitEight.checked = true;
     document.forms[0].digitNine.checked = true;
+    document.forms[0].digitTen.checked = true;
+    document.forms[0].digitEleven.checked = true;
+    document.forms[0].digitTwelve.checked = true;
 }
 
 function clearAllDigits() {
@@ -27,6 +30,9 @@ function clearAllDigits() {
     document.forms[0].digitSeven.checked = false;
     document.forms[0].digitEight.checked = false;
     document.forms[0].digitNine.checked = false;
+    document.forms[0].digitTen.checked = false;
+    document.forms[0].digitEleven.checked = false;
+    document.forms[0].digitTwelve.checked = false;
 }
 
 function selectAllOperations() {

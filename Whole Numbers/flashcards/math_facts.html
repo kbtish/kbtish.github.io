@@ -87,8 +87,19 @@ span {
             numSelected++;
             digit[numSelected - 1] = 9;
         }
+        if (document.forms[0].digitTen.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 10;
+        }        
+        if (document.forms[0].digitEleven.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 11;
+        }
+        if (document.forms[0].digitTwelve.checked == true) {
+            numSelected++;
+            digit[numSelected - 1] = 12;
+        }
         
-
         // randomly select which digit to use for one of the numbers
         var i = Math.floor(Math.random() * numSelected);
         
@@ -121,7 +132,16 @@ span {
         }
         else if (digit[i] == '9') {
             return 9;
-        }        
+        }
+        else if (digit[i] == '10') {
+            return 10;
+        }
+        else if (digit[i] == '11') {
+            return 11;
+        }
+        else if (digit[i] == '12') {
+            return 12;
+        }  
     } // end of useSelectedDigits()
     
     // determine what kind of question to display
@@ -380,6 +400,9 @@ span {
         document.forms[0].digitSeven.disabled = true;
         document.forms[0].digitEight.disabled = true;
         document.forms[0].digitNine.disabled = true;
+        document.forms[0].digitTen.disabled = true;        
+        document.forms[0].digitEleven.disabled = true;        
+        document.forms[0].digitTwelve.disabled = true;        
     } // end of startTimer()
     
     // more running of the timer
@@ -457,6 +480,9 @@ span {
         document.forms[0].digitSeven.disabled = false;
         document.forms[0].digitEight.disabled = false;
         document.forms[0].digitNine.disabled = false;
+        document.forms[0].digitTen.disabled = false;
+        document.forms[0].digitEleven.disabled = false;
+        document.forms[0].digitTwelve.disabled = false;
     } // end of stopTimer()
     
     // change the autofocus to support mobile and tablet devices
@@ -496,7 +522,10 @@ span {
             && document.forms[0].digitSix.checked == false
             && document.forms[0].digitSeven.checked == false
             && document.forms[0].digitEight.checked == false
-            && document.forms[0].digitNine.checked == false) {
+            && document.forms[0].digitNine.checked == false
+            && document.forms[0].digitTen.checked == false
+            && document.forms[0].digitEleven.checked == false
+            && document.forms[0].digitTwelve.checked == false) {
             
                 var j = true;
         }
@@ -759,6 +788,9 @@ span {
             Choose your digits
         </span>
         <br />
+        10<input type='checkbox' name='digitTen' />&nbsp;
+        11<input type='checkbox' name='digitEleven' />&nbsp;
+        12<input type='checkbox' name='digitTwelve' /><br />
         7<input type='checkbox' name='digitSeven' checked='checked' />&nbsp;&nbsp;&nbsp;
         8<input type='checkbox' name='digitEight' checked='checked' />&nbsp;&nbsp;&nbsp;
         9<input type='checkbox' name='digitNine' checked='checked' /><br />
