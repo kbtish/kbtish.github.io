@@ -146,6 +146,8 @@ span {
     // display prices with two decimal places, if any
     function displayDecimal(price) {
         var i = price*100;
+        i = parseInt(i); // in case result comes out as a decimal, e.g. 36.7*100 = 3670.0000000000005
+        
         var j = price*10;
         if ((i%10 == 0) && (j%10 != 0)) {
             price += '0';
@@ -269,6 +271,8 @@ span {
         
         // display the problem
         document.getElementById('problemSpace').innerHTML = problem;
+        
+        // give instructions for rounding
         giveRounding();
         
     } // end of getQuestion()
